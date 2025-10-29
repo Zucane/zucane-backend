@@ -8,7 +8,7 @@ from stellar_sdk import (
 
 from stellar_sdk.operation import ChangeTrust, Payment
 
-import config
+from . import config
 
 def establish_trustline(asset_name):
 

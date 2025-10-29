@@ -1,6 +1,3 @@
-#RUN ONLY ONCE TO GENERATE GOVERNMENT AND TREASURY KEYS
-# IMPORTANT -- > Copy and paste them into config.py
-
 from stellar_sdk import Keypair
 
 import requests
@@ -30,7 +27,3 @@ if __name__ == "__main__":
         print(f"GOVERNMENT_SS: {GOVERNMENT_SS}\n")
         print(f"TREASURY_PK: {TREASURY_PK}")
         print(f"TREASURY_SS: {TREASURY_SS}")
-
-
-
-
