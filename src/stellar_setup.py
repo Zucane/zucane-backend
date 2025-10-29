@@ -8,15 +8,15 @@ from stellar_sdk import (
 
 from stellar_sdk.operation import ChangeTrust, Payment
 
-from . import config
+from .shared.config import settings
 
 def establish_trustline(asset_name):
 
-    asset = Asset(asset_name, config.GOVERNMENT_P)
+    asset = Asset(asset_name, settings.GOVERNMENT_PUBLIC_KEY)
 
     server = Server(horizon_url="https://horizon-testnet.stellar.org")
-    government_keypair = Keypair.from_public_key(config.GOVERNMENT_P)
-    treasury_keypair = Keypair.from_secret(config.TREASURY_S)
+    government_keypair = Keypair.from_public_key(settings.GOVERNMENT_PUBLIC_KEY)
+    treasury_keypair = Keypair.from_secret(settings.TREASURY_SECRET_KEY)
 
     account_treasury = server.load_account(treasury_keypair.public_key)
 
@@ -38,11 +38,11 @@ def establish_trustline(asset_name):
     server.submit_transaction(tx)
 
 def print_and_fund_tokens(asset_name, amount_to_print):
-    asset = Asset(asset_name, config.GOVERNMENT_P)
+    asset = Asset(asset_name, settings.GOVERNMENT_PUBLIC_KEY)
 
     server = Server(horizon_url="https://horizon-testnet.stellar.org")
 
-    government_keypair = Keypair.from_secret(config.GOVERNMENT_S)
+    government_keypair = Keypair.from_secret(settings.GOVERNMENT_SECRET_KEY)
 
     account_government = server.load_account(government_keypair.public_key)
 
@@ -53,7 +53,7 @@ def print_and_fund_tokens(asset_name, amount_to_print):
     )
 
     operation = Payment(
-        destination=config.TREASURY_P,
+        destination=settings.TREASURY_PUBLIC_KEY,
         asset=asset,
         amount=amount_to_print
     )
@@ -67,6 +67,6 @@ def print_and_fund_tokens(asset_name, amount_to_print):
     return response
 
 if __name__ == "__main__":
-    establish_trustline(config.ASSET_NAME)
-    response = print_and_fund_tokens(config.ASSET_NAME, "1000000")
+    establish_trustline(settings.ASSET_NAME)
+    response = print_and_fund_tokens(settings.ASSET_NAME, "1000000")
     print(response)

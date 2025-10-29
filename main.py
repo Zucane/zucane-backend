@@ -1,6 +1,6 @@
 """
-QRise Backend - Main Entry Point
-Stellar Network Integration for QRise Project
+Zucane Backend - Main Entry Point
+Stellar Network Integration for Zucane Project
 """
 
 import sys
@@ -8,23 +8,23 @@ import os
 
 sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
 
-from src import config
+from src.shared.config import settings
 from src.stellar_setup import establish_trustline, print_and_fund_tokens
 
 def main():
     """Función principal para ejecutar el setup de Stellar"""
-    print("🚀 Iniciando QRise Backend - Stellar Setup")
-    print(f"📊 Asset: {config.ASSET_NAME}")
-    print(f"🏛️  Government: {config.GOVERNMENT_P}")
-    print(f"💰 Treasury: {config.TREASURY_P}")
+    print("🚀 Iniciando Zucane Backend - Stellar Setup")
+    print(f"📊 Asset: {settings.ASSET_NAME}")
+    print(f"🏛️  Government: {settings.GOVERNMENT_PUBLIC_KEY}")
+    print(f"💰 Treasury: {settings.TREASURY_PUBLIC_KEY}")
     
     try:
         print("\n🔗 Estableciendo trustline...")
-        establish_trustline(config.ASSET_NAME)
+        establish_trustline(settings.ASSET_NAME)
         print("✅ Trustline establecido correctamente")
         
         print("\n💰 Imprimiendo y fondeando tokens...")
-        response = print_and_fund_tokens(config.ASSET_NAME, "1000000")
+        response = print_and_fund_tokens(settings.ASSET_NAME, "1000000")
         print("✅ Tokens impresos y fondeados correctamente")
         print(f"📋 Respuesta: {response}")
         

@@ -1,1 +1,1 @@
-# QRise Backend - Stellar Network Integration
+# Zucane Backend - Stellar Network Integration
