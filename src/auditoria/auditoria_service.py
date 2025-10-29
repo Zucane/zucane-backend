@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from datetime import datetime
-from .entity.auditoria_entity import AuditoriaTransaccion
+from .entity.auditoria_entity import AuditLog
 from .dto.auditoria_dto import (
     AuditoriaCreateDTO, 
     AuditoriaUpdateDTO, 
@@ -12,6 +12,27 @@ from .dto.auditoria_dto import (
 from .auditoria_repository import AuditoriaRepository
 
 
+def _map_audit_log_to_dto(auditoria: AuditLog) -> AuditoriaResponseDTO:
+    """Helper para mapear AuditLog a AuditoriaResponseDTO con compatibilidad"""
+    dto_dict = {
+        "audit_id": auditoria.audit_id,
+        "entity_type": auditoria.entity_type,
+        "entity_id": auditoria.entity_id,
+        "actor": auditoria.actor,
+        "action": auditoria.action,
+        "fecha_accion": auditoria.fecha_accion,
+        "detalles": auditoria.detalles,
+        "idempotency_key": auditoria.idempotency_key,
+        "stellar_tx_hash": auditoria.stellar_tx_hash,
+        # Campos legacy
+        "auditoria_id": auditoria.audit_id,
+        "transaccion_id": auditoria.entity_id if auditoria.entity_type == "TRANSACTION" else None,
+        "usuario_id": None,
+        "accion_legacy": auditoria.action
+    }
+    return AuditoriaResponseDTO(**dto_dict)
+
+
 class AuditoriaService:
     
     def __init__(self, db: Session):
@@ -19,7 +40,24 @@ class AuditoriaService:
     
     def crear_auditoria(self, auditoria_data: AuditoriaCreateDTO) -> AuditoriaResponseDTO:
         auditoria = self.repository.create(auditoria_data)
-        return AuditoriaResponseDTO.from_orm(auditoria)
+        # Mapear a DTO con compatibilidad
+        dto_dict = {
+            "audit_id": auditoria.audit_id,
+            "entity_type": auditoria.entity_type,
+            "entity_id": auditoria.entity_id,
+            "actor": auditoria.actor,
+            "action": auditoria.action,
+            "fecha_accion": auditoria.fecha_accion,
+            "detalles": auditoria.detalles,
+            "idempotency_key": auditoria.idempotency_key,
+            "stellar_tx_hash": auditoria.stellar_tx_hash,
+            # Campos legacy
+            "auditoria_id": auditoria.audit_id,
+            "transaccion_id": auditoria.entity_id if auditoria.entity_type == "TRANSACTION" else None,
+            "usuario_id": None,
+            "accion": auditoria.action
+        }
+        return AuditoriaResponseDTO(**dto_dict)
     
     def obtener_auditoria(self, auditoria_id: int) -> Optional[AuditoriaResponseDTO]:
         auditoria = self.repository.get_by_id(auditoria_id)
@@ -32,7 +70,7 @@ class AuditoriaService:
         auditorias = self.repository.get_by_transaccion(transaccion_id, skip=skip, limit=size)
         total = self.repository.count_by_transaccion(transaccion_id)
         
-        auditorias_dto = [AuditoriaResponseDTO.from_orm(auditoria) for auditoria in auditorias]
+        auditorias_dto = [_map_audit_log_to_dto(auditoria) for auditoria in auditorias]
         
         return AuditoriaListDTO(
             auditorias=auditorias_dto,
@@ -46,7 +84,7 @@ class AuditoriaService:
         auditorias = self.repository.get_by_usuario(usuario_id, skip=skip, limit=size)
         total = self.repository.count_by_usuario(usuario_id)
         
-        auditorias_dto = [AuditoriaResponseDTO.from_orm(auditoria) for auditoria in auditorias]
+        auditorias_dto = [_map_audit_log_to_dto(auditoria) for auditoria in auditorias]
         
         return AuditoriaListDTO(
             auditorias=auditorias_dto,
@@ -60,7 +98,7 @@ class AuditoriaService:
         auditorias = self.repository.get_by_filtros(filtros, skip=skip, limit=size)
         total = self.repository.count_by_filtros(filtros)
         
-        auditorias_dto = [AuditoriaResponseDTO.from_orm(auditoria) for auditoria in auditorias]
+        auditorias_dto = [_map_audit_log_to_dto(auditoria) for auditoria in auditorias]
         
         return AuditoriaListDTO(
             auditorias=auditorias_dto,
@@ -74,7 +112,7 @@ class AuditoriaService:
         auditorias = self.repository.get_all(skip=skip, limit=size)
         total = self.repository.get_total_count()
         
-        auditorias_dto = [AuditoriaResponseDTO.from_orm(auditoria) for auditoria in auditorias]
+        auditorias_dto = [_map_audit_log_to_dto(auditoria) for auditoria in auditorias]
         
         return AuditoriaListDTO(
             auditorias=auditorias_dto,
@@ -87,7 +125,7 @@ class AuditoriaService:
         auditoria = self.repository.update(auditoria_id, auditoria_data)
         if not auditoria:
             return None
-        return AuditoriaResponseDTO.from_orm(auditoria)
+        return _map_audit_log_to_dto(auditoria)
     
     def registrar_accion(self, transaccion_id: int, accion: str, detalles: str = "", usuario_id: Optional[int] = None) -> AuditoriaResponseDTO:
         auditoria_data = AuditoriaCreateDTO(

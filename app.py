@@ -1,9 +1,3 @@
-"""
-Zucane Backend - FastAPI Application
-Sistema de Tokens de CO2 con Integración Stellar
-Arquitectura por Dominio
-"""
-
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
@@ -17,11 +11,14 @@ from src.shared.database import get_db, create_tables
 from src.shared.config import settings
 
 # Importar routers de cada dominio
+from src.auth.auth_controller import router as auth_router
 from src.empresas.empresa_controller import router as empresas_router
 from src.tokens.token_controller import router as tokens_router
+from src.orders.order_controller import router as orders_router
 from src.transacciones.transaccion_controller import router as transacciones_router
 from src.pagos.pago_controller import router as pagos_router
 from src.auditoria.auditoria_controller import router as auditoria_router
+from src.system.system_controller import router as system_router
 
 # Crear aplicación FastAPI
 app = FastAPI(
@@ -33,11 +30,14 @@ app = FastAPI(
     Sistema completo para la gestión de tokens de carbono con integración a Stellar Network.
     
     ### 🏗️ Arquitectura por Dominio
+    - **Auth**: Autenticación y gestión de usuarios
     - **Empresas**: Gestión de empresas compradoras
     - **Tokens**: Tokens de CO2 emitidos por el gobierno
+    - **Orders**: Sistema de reservas con TTL
     - **Transacciones**: Compras de tokens por empresas
     - **Pagos**: Pagos físicos a productores
     - **Auditoría**: Registro de todas las acciones
+    - **System**: Idempotencia y eventos asíncronos
     
     ### 🔗 Integración Stellar
     - Transacciones blockchain para tokens
@@ -64,12 +64,20 @@ app = FastAPI(
     },
     tags_metadata=[
         {
+            "name": "autenticación",
+            "description": "Autenticación y gestión de usuarios",
+        },
+        {
             "name": "empresas",
             "description": "Gestión de empresas compradoras de tokens de CO2",
         },
         {
             "name": "tokens",
             "description": "Tokens de CO2 emitidos por el gobierno",
+        },
+        {
+            "name": "reservas",
+            "description": "Sistema de reservas de tokens con TTL",
         },
         {
             "name": "transacciones",
@@ -82,6 +90,10 @@ app = FastAPI(
         {
             "name": "auditoria",
             "description": "Registros de auditoría del sistema",
+        },
+        {
+            "name": "sistema",
+            "description": "Idempotencia y eventos asíncronos",
         },
         {
             "name": "health",
@@ -100,11 +112,14 @@ app.add_middleware(
 )
 
 # Incluir routers de cada dominio
+app.include_router(auth_router, prefix=settings.API_V1_STR)
 app.include_router(empresas_router, prefix=settings.API_V1_STR)
 app.include_router(tokens_router, prefix=settings.API_V1_STR)
+app.include_router(orders_router, prefix=settings.API_V1_STR)
 app.include_router(transacciones_router, prefix=settings.API_V1_STR)
 app.include_router(pagos_router, prefix=settings.API_V1_STR)
 app.include_router(auditoria_router, prefix=settings.API_V1_STR)
+app.include_router(system_router, prefix=settings.API_V1_STR)
 
 
 @app.on_event("startup")

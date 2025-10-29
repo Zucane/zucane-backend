@@ -7,13 +7,10 @@ from ...shared.database import Base
 
 class Transaccion(Base):
     __tablename__ = "transacciones"
-    __table_args__ = (
-        UniqueConstraint("token_id", name="uq_trans_token"),
-    )
     
     transaccion_id: Mapped[int] = mapped_column(Integer, primary_key=True)
     empresa_id: Mapped[int] = mapped_column(ForeignKey("empresas.empresa_id"), nullable=False, index=True)
-    token_id: Mapped[int] = mapped_column(ForeignKey("tokens_co2.token_id"), nullable=False)
+    order_id: Mapped[int] = mapped_column(ForeignKey("orders.order_id"), nullable=False, index=True)
     monto: Mapped[float] = mapped_column(Numeric(12, 2), nullable=False)
     fecha_compra: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
     status: Mapped[str] = mapped_column(
@@ -22,13 +19,13 @@ class Transaccion(Base):
         nullable=False
     )
     
-    # Campos para integración con Stellar
     stellar_tx_hash: Mapped[Optional[str]] = mapped_column(String(64), nullable=True, unique=True)
     stellar_asset_code: Mapped[Optional[str]] = mapped_column(String(12), nullable=True)
     
     # Relaciones
     empresa: Mapped["Empresa"] = relationship("Empresa", back_populates="transacciones")
-    token: Mapped["TokenCO2"] = relationship("TokenCO2", back_populates="transacciones")
+    order: Mapped["Order"] = relationship("Order", back_populates="transacciones")
+    transaccion_items: Mapped[List["TransaccionItem"]] = relationship("TransaccionItem", back_populates="transaccion")
     pagos_productores: Mapped[List["PagoProductor"]] = relationship("PagoProductor", back_populates="transaccion")
     auditorias: Mapped[List["AuditoriaTransaccion"]] = relationship("AuditoriaTransaccion", back_populates="transaccion")
     

@@ -21,12 +21,19 @@ class AuditoriaUpdateDTO(BaseModel):
 
 
 class AuditoriaResponseDTO(BaseModel):
-    auditoria_id: int
-    transaccion_id: int
-    usuario_id: Optional[int]
-    accion: str
+    audit_id: int
+    entity_type: str
+    entity_id: int
+    actor: str
+    action: str
     fecha_accion: datetime
     detalles: str
+    idempotency_key: Optional[str] = None
+    stellar_tx_hash: Optional[str] = None
+    auditoria_id: Optional[int] = None
+    transaccion_id: Optional[int] = None
+    usuario_id: Optional[int] = None
+    accion: Optional[str] = None
     
     class Config:
         from_attributes = True
