@@ -115,18 +115,229 @@ DB_PASSWORD=pass
 DB_NAME=zucane_db
 ```
 
-### 5. Configurar base de datos
+### 5. Configurar base de datos MySQL
+
+#### 5.0 Resumen rápido (3 pasos)
 ```bash
-# Crear base de datos MySQL
-mysql -u root -p
+# 1. Crear BD y usuario
 CREATE DATABASE zucane_db;
 CREATE USER 'user'@'localhost' IDENTIFIED BY 'pass';
 GRANT ALL PRIVILEGES ON zucane_db.* TO 'user'@'localhost';
 FLUSH PRIVILEGES;
 EXIT;
 
-# Ejecutar setup de base de datos
-python setup_database.py
+# 2. Crear tablas
+python app.py  # Dejar correr unos segundos, luego Ctrl+C
+
+# 3. Insertar datos de prueba
+mysql -u user -p zucane_db
+# Ejecutar comandos SQL de la sección 5.6
+```
+
+#### 5.1 Crear base de datos y usuario
+```bash
+
+# Crear base de datos
+CREATE DATABASE zucane_db;
+
+# Crear usuario
+CREATE USER 'user'@'localhost' IDENTIFIED BY 'pass';
+
+# Dar permisos
+GRANT ALL PRIVILEGES ON zucane_db.* TO 'user'@'localhost';
+FLUSH PRIVILEGES;
+
+# Verificar que funciona
+USE zucane_db;
+SHOW TABLES;
+EXIT;
+```
+
+#### 5.2 Crear tablas y datos manualmente
+
+**Paso 1: Crear las tablas**
+```bash
+# Ejecutar la aplicación para crear las tablas
+python app.py
+# Dejar corriendo unos segundos y luego Ctrl+C para detener
+```
+
+Esto creará automáticamente:
+- ✅ Todas las tablas de la base de datos
+- ✅ Estructura completa del sistema
+
+**Paso 2: Insertar datos de prueba**
+```bash
+# Conectar a MySQL
+mysql -u user -p zucane_db
+
+# Ejecutar los comandos SQL de la sección 5.6
+# (Roles, usuario admin, empresa de prueba, tokens)
+```
+
+**Paso 3: Verificar que todo funciona**
+```bash
+# Ejecutar la aplicación nuevamente
+python app.py
+# Ir a http://localhost:8000/docs para probar
+```
+
+#### 5.3 Verificar configuración
+```bash
+# Conectar con el usuario creado
+mysql -u user -p zucane_db
+
+# Verificar tablas creadas
+SHOW TABLES;
+
+# Verificar datos insertados
+SELECT * FROM users;
+SELECT * FROM roles;
+SELECT * FROM empresas;
+SELECT * FROM tokens_co2;
+```
+
+#### 5.4 Datos de prueba incluidos
+
+**Usuario Administrador:**
+- Email: `admin@gobierno.mx`
+- Password: `admin123`
+- Rol: `GOV_ADMIN`
+
+**Empresa de Prueba:**
+- RFC: `ABC123456789`
+- Nombre: `Empresa de Prueba S.A. de C.V.`
+- Stellar Public Key: `GCTWI7YUCLHG2KAYZPN2VZGLKXITW474P2CMP2UJTTH56PGDL72YLLNZ`
+
+**Tokens de Prueba:**
+- 3 tokens de 1.0 tonelada CO2 cada uno
+- Status: `disponible`
+- Asset: `XOCHI`
+
+#### 5.5 Estructura de tablas creadas
+
+```sql
+-- Tablas principales
+users                    # Usuarios del sistema
+roles                    # Roles (GOV_ADMIN, COMPANY_USER)
+empresas                 # Empresas compradoras
+tokens_co2              # Tokens de CO2
+transacciones           # Transacciones de compra
+pagos_productores       # Pagos a productores
+audit_logs              # Registros de auditoría
+idempotency_keys        # Claves de idempotencia
+outbox_events           # Eventos para procesar
+orders                  # Órdenes de compra
+order_items             # Items de órdenes
+transaccion_items       # Items de transacciones
+usuario_roles           # Relación usuarios-roles
+```
+
+#### 5.6 Comandos SQL manuales (si necesitas hacerlo paso a paso)
+
+**Crear roles del sistema:**
+```sql
+INSERT INTO roles (nombre, descripcion) VALUES 
+('GOV_ADMIN', 'Administrador del gobierno'),
+('COMPANY_USER', 'Usuario de empresa');
+```
+
+**Crear usuario administrador:**
+```sql
+INSERT INTO users (email, password_hash, nombre, apellido, telefono, created_at) VALUES 
+('admin@gobierno.mx', 'ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f', 'Admin', 'Sistema', '555-0001', NOW());
+```
+
+**Crear empresa de prueba:**
+```sql
+INSERT INTO empresas (rfc, nombre, email, telefono, direccion, stellar_public_key, status, created_at) VALUES 
+('ABC123456789', 'Empresa de Prueba S.A. de C.V.', 'contacto@empresaprueba.com', '555-0002', 'Calle de Prueba 123, Ciudad de México', 'GCTWI7YUCLHG2KAYZPN2VZGLKXITW474P2CMP2UJTTH56PGDL72YLLNZ', 'activo', NOW());
+```
+
+**Emitir tokens de prueba:**
+```sql
+INSERT INTO tokens_co2 (cantidad_co2, asset_code, issuer_pubkey, dist_pubkey, status, created_at) VALUES 
+(1.0, 'XOCHI', 'GBL44HGF3K7NLLCIKIEILGVHMASXB7QAZROZU2XISRFOJG6R4GNWZ6RY', 'GCTWI7YUCLHG2KAYZPN2VZGLKXITW474P2CMP2UJTTH56PGDL72YLLNZ', 'disponible', NOW()),
+(1.0, 'XOCHI', 'GBL44HGF3K7NLLCIKIEILGVHMASXB7QAZROZU2XISRFOJG6R4GNWZ6RY', 'GCTWI7YUCLHG2KAYZPN2VZGLKXITW474P2CMP2UJTTH56PGDL72YLLNZ', 'disponible', NOW()),
+(1.0, 'XOCHI', 'GBL44HGF3K7NLLCIKIEILGVHMASXB7QAZROZU2XISRFOJG6R4GNWZ6RY', 'GCTWI7YUCLHG2KAYZPN2VZGLKXITW474P2CMP2UJTTH56PGDL72YLLNZ', 'disponible', NOW());
+```
+
+#### 5.7 Solución de problemas comunes
+
+**Error: "Access denied for user 'user'@'localhost'"**
+```bash
+# Verificar que el usuario existe
+mysql -u root -p
+SELECT User, Host FROM mysql.user WHERE User = 'user';
+```
+
+**Error: "Database 'zucane_db' doesn't exist"**
+```bash
+# Crear la base de datos manualmente
+mysql -u root -p
+CREATE DATABASE zucane_db;
+```
+
+**Error: "Table doesn't exist"**
+```bash
+# Ejecutar la aplicación para crear tablas
+python app.py
+```
+
+**Error: "Duplicate entry"**
+```bash
+# Limpiar datos existentes
+mysql -u user -p zucane_db
+DROP DATABASE zucane_db;
+CREATE DATABASE zucane_db;
+# Luego ejecutar python app.py y los comandos SQL de la sección 5.6
+```
+
+**Error: "Column 'stellar_public_key' cannot be null"**
+```bash
+# Verificar que la empresa tiene stellar_public_key
+mysql -u user -p zucane_db
+SELECT rfc, nombre, stellar_public_key FROM empresas;
+```
+
+#### 5.8 Verificación rápida del setup
+
+**Comando de verificación completa:**
+```bash
+# Verificar que todo está configurado correctamente
+mysql -u user -p zucane_db -e "
+SELECT 'USERS' as tabla, COUNT(*) as registros FROM users
+UNION ALL
+SELECT 'ROLES', COUNT(*) FROM roles
+UNION ALL
+SELECT 'EMPRESAS', COUNT(*) FROM empresas
+UNION ALL
+SELECT 'TOKENS', COUNT(*) FROM tokens_co2;
+"
+```
+
+**Resultado esperado:**
+```
++----------+-----------+
+| tabla    | registros |
++----------+-----------+
+| USERS    |         1 |
+| ROLES    |         2 |
+| EMPRESAS |         1 |
+| TOKENS   |         3 |
++----------+-----------+
+```
+
+**Verificar datos específicos:**
+```bash
+# Usuario admin
+mysql -u user -p zucane_db -e "SELECT email, nombre FROM users WHERE email = 'admin@gobierno.mx';"
+
+# Empresa de prueba
+mysql -u user -p zucane_db -e "SELECT rfc, nombre, stellar_public_key FROM empresas WHERE rfc = 'ABC123456789';"
+
+# Tokens disponibles
+mysql -u user -p zucane_db -e "SELECT token_id, cantidad_co2, status FROM tokens_co2 WHERE status = 'disponible';"
 ```
 
 ## 🎯 Uso
@@ -311,6 +522,4 @@ python app.py
 
 - [ ] Implementar autenticación JWT completa
 - [ ] Agregar tests unitarios
-- [ ] Implementar rate limiting
 - [ ] Agregar métricas y monitoreo
-- [ ] Migrar a Stellar Mainnet para producción
