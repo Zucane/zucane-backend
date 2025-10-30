@@ -81,7 +81,10 @@ async def login(login_data: LoginRequest, db: Session = Depends(get_db)):
         )
 
     empresa = db.query(Empresa).filter(Empresa.email == user.email).first()
-    stellar_public_key = empresa.stellar_public_key if empresa else None
+    if empresa and empresa.stellar_public_key:
+        stellar_public_key = empresa.stellar_public_key
+    else:
+        stellar_public_key = user.stellar_public_key
     
     return LoginResponse(
         success=True,
