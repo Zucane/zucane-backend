@@ -33,20 +33,20 @@ class TransaccionService:
             "empresa_id": transaccion_data.empresa_id
         })
         
-        return TransaccionResponseDTO.from_orm(transaccion)
+        return TransaccionResponseDTO.model_validate(transaccion)
     
     def obtener_transaccion(self, transaccion_id: int) -> Optional[TransaccionResponseDTO]:
         transaccion = self.repository.get_by_id(transaccion_id)
         if not transaccion:
             return None
-        return TransaccionResponseDTO.from_orm(transaccion)
+        return TransaccionResponseDTO.model_validate(transaccion)
     
     def listar_transacciones_empresa(self, empresa_id: int, page: int = 1, size: int = 10) -> TransaccionListDTO:
         skip = (page - 1) * size
         transacciones = self.repository.get_by_empresa(empresa_id, skip=skip, limit=size)
         total = self.repository.count_by_empresa(empresa_id)
         
-        transacciones_dto = [TransaccionResponseDTO.from_orm(tx) for tx in transacciones]
+        transacciones_dto = [TransaccionResponseDTO.model_validate(tx) for tx in transacciones]
         
         return TransaccionListDTO(
             transacciones=transacciones_dto,
@@ -60,7 +60,7 @@ class TransaccionService:
         transacciones = self.repository.get_by_status(status, skip=skip, limit=size)
         total = self.repository.count_by_status(status)
         
-        transacciones_dto = [TransaccionResponseDTO.from_orm(tx) for tx in transacciones]
+        transacciones_dto = [TransaccionResponseDTO.model_validate(tx) for tx in transacciones]
         
         return TransaccionListDTO(
             transacciones=transacciones_dto,
@@ -82,7 +82,7 @@ class TransaccionService:
         # Marcar token como vendido
         self.token_service.vender_tokens([transaccion.token_id])
         
-        return TransaccionResponseDTO.from_orm(transaccion)
+        return TransaccionResponseDTO.model_validate(transaccion)
     
     def fallar_transaccion(self, transaccion_id: int) -> Optional[TransaccionResponseDTO]:
         transaccion = self.repository.fail_transaction(transaccion_id)
@@ -92,9 +92,9 @@ class TransaccionService:
         # Liberar token reservado
         self.token_service.liberar_tokens([transaccion.token_id])
         
-        return TransaccionResponseDTO.from_orm(transaccion)
+        return TransaccionResponseDTO.model_validate(transaccion)
     
     def procesar_transacciones_pendientes(self) -> List[TransaccionResponseDTO]:
         transacciones_pendientes = self.repository.get_pending_transactions()
         # Aquí iría la lógica para procesar con Stellar Network
-        return [TransaccionResponseDTO.from_orm(tx) for tx in transacciones_pendientes]
+        return [TransaccionResponseDTO.model_validate(tx) for tx in transacciones_pendientes]

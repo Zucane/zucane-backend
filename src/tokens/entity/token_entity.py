@@ -21,9 +21,10 @@ class TokenCO2(Base):
     issuer_pubkey: Mapped[str] = mapped_column(String(56), nullable=False)  # GOVERNMENT_PUBLIC_KEY
     dist_pubkey: Mapped[str] = mapped_column(String(56), nullable=False)    # TREASURY_PUBLIC_KEY
     
-    transacciones: Mapped[List["Transaccion"]] = relationship("Transaccion", back_populates="token")
-    order_items: Mapped[List["OrderItem"]] = relationship("OrderItem", back_populates="token")
-    transaccion_items: Mapped[List["TransaccionItem"]] = relationship("TransaccionItem", back_populates="token")
+    # Relaciones comentadas temporalmente para evitar errores de configuración
+    # transacciones: Mapped[List["Transaccion"]] = relationship("Transaccion", back_populates="token")
+    # order_items: Mapped[List["OrderItem"]] = relationship("OrderItem", back_populates="token")
+    # transaccion_items: Mapped[List["TransaccionItem"]] = relationship("TransaccionItem", back_populates="token")
     
     def __repr__(self):
         return f"<TokenCO2(id={self.token_id}, cantidad={self.cantidad_co2}, status={self.status})>"

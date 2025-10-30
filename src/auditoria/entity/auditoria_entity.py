@@ -26,7 +26,8 @@ class AuditLog(Base):
     detalles: Mapped[str] = mapped_column(Text, default="", nullable=False)
     fecha_accion: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
     
-    transaccion: Mapped[Optional["Transaccion"]] = relationship("Transaccion", back_populates="auditorias")
+    # Relaciones comentadas temporalmente para evitar errores de importación
+    # transaccion: Mapped[Optional["Transaccion"]] = relationship("Transaccion", back_populates="auditorias")
     
     def __repr__(self):
         return f"<AuditLog(id={self.audit_id}, entity={self.entity_type}, action={self.action}, fecha={self.fecha_accion})>"

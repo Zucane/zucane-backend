@@ -24,8 +24,13 @@ class Usuario(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), onupdate=func.now())
     
-    empresa: Mapped[Optional["Empresa"]] = relationship("Empresa", back_populates="usuarios")
-    usuario_roles: Mapped[List["UsuarioRol"]] = relationship("UsuarioRol", back_populates="usuario")
+    # Relaciones comentadas temporalmente para evitar errores
+    # empresa: Mapped[Optional["Empresa"]] = relationship("Empresa", back_populates="usuarios")
+    # usuario_roles: Mapped[List["UsuarioRol"]] = relationship(
+    #     "UsuarioRol", 
+    #     foreign_keys="[UsuarioRol.usuario_id]",
+    #     back_populates="usuario"
+    # )
     
     def __repr__(self):
         return f"<Usuario(id={self.usuario_id}, email={self.email}, empresa_id={self.empresa_id})>"

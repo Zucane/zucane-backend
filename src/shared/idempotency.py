@@ -41,7 +41,6 @@ class IdempotencyService:
 
 
 def get_idempotency_key(request: Request) -> Optional[str]:
-    """Extrae la clave de idempotencia del header"""
     return request.headers.get("Idempotency-Key")
 
 
@@ -49,7 +48,6 @@ def check_idempotency(
     idempotency_key: Optional[str] = Depends(get_idempotency_key),
     db: Session = Depends(get_db)
 ):
-    """Middleware para verificar idempotencia"""
     if not idempotency_key:
         return None
     

@@ -81,6 +81,5 @@ async def fallar_transaccion(
 
 @router.get("/pendientes/procesar", response_model=List[TransaccionResponseDTO])
 async def procesar_transacciones_pendientes(db: Session = Depends(get_db)):
-    """Procesar transacciones pendientes"""
     service = TransaccionService(db)
     return service.procesar_transacciones_pendientes()

@@ -1,7 +1,3 @@
-"""
-Zucane Backend - Main Entry Point
-Stellar Network Integration for Zucane Project
-"""
 
 import sys
 import os
@@ -12,7 +8,6 @@ from src.shared.config import settings
 from src.stellar_setup import establish_trustline, print_and_fund_tokens
 
 def main():
-    """Función principal para ejecutar el setup de Stellar"""
     print("🚀 Iniciando Zucane Backend - Stellar Setup")
     print(f"📊 Asset: {settings.ASSET_NAME}")
     print(f"🏛️  Government: {settings.GOVERNMENT_PUBLIC_KEY}")

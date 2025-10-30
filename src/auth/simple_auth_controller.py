@@ -1,42 +1,21 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from datetime import datetime
 from ..shared.database import get_db
-from .entity.user_entity import User
-from pydantic import BaseModel
+from .dto.auth_dto import LoginRequest, LoginResponse, UserProfile
+from .entity.usuario_entity import Usuario
 
-router = APIRouter(prefix="/auth", tags=["autenticación"])
-
-
-class LoginRequest(BaseModel):
-    email: str
-    password: str
-
-
-class LoginResponse(BaseModel):
-    success: bool
-    message: str
-    user_id: int
-    email: str
-
-
-class UserProfile(BaseModel):
-    id: int
-    email: str
-    name: str
-    status: str
-    created_at: datetime
+router = APIRouter(prefix="/auth", tags=["autenticación simple"])
 
 
 @router.post("/login", response_model=LoginResponse)
 async def login(login_data: LoginRequest, db: Session = Depends(get_db)):
     # Buscar usuario por email
-    user = db.query(User).filter(User.email == login_data.email).first()
+    user = db.query(Usuario).filter(Usuario.email == login_data.email).first()
     
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Usuario no encontrado"
+            detail="Credenciales inválidas"
         )
     
     # Verificar contraseña (hash simple)
@@ -45,27 +24,30 @@ async def login(login_data: LoginRequest, db: Session = Depends(get_db)):
     if password_hash != user.password_hash:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Contraseña incorrecta"
+            detail="Credenciales inválidas"
         )
     
     # Verificar que el usuario esté activo
-    if user.status != 'active':
+    if user.status != 'activo':
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Usuario inactivo"
         )
     
+    # Respuesta simple sin JWT
     return LoginResponse(
-        success=True,
-        message="Login exitoso",
-        user_id=user.id,
-        email=user.email
+        access_token="simple_token_12345",
+        token_type="simple",
+        user_id=user.usuario_id,
+        email=user.email,
+        roles=["GOV_ADMIN"]
     )
 
 
-@router.get("/profile/{user_id}", response_model=UserProfile)
+@router.get("/profile")
 async def get_profile(user_id: int, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.id == user_id).first()
+    # Buscar usuario por ID
+    user = db.query(Usuario).filter(Usuario.usuario_id == user_id).first()
     
     if not user:
         raise HTTPException(
@@ -74,10 +56,14 @@ async def get_profile(user_id: int, db: Session = Depends(get_db)):
         )
     
     return UserProfile(
-        id=user.id,
+        usuario_id=user.usuario_id,
         email=user.email,
-        name=user.name,
+        nombre=user.nombre,
+        apellido=user.apellido,
+        empresa_id=user.empresa_id,
+        telefono=user.telefono,
         status=user.status,
+        last_login=user.last_login,
         created_at=user.created_at
     )
 

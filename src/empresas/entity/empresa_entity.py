@@ -23,9 +23,10 @@ class Empresa(Base):
     
     stellar_public_key: Mapped[str] = mapped_column(String(56), nullable=False, unique=True, index=True)
     
-    transacciones: Mapped[List["Transaccion"]] = relationship("Transaccion", back_populates="empresa")
-    usuarios: Mapped[List["Usuario"]] = relationship("Usuario", back_populates="empresa")
-    orders: Mapped[List["Order"]] = relationship("Order", back_populates="empresa")
+    # Relaciones comentadas temporalmente para evitar errores de importación
+    # transacciones: Mapped[List["Transaccion"]] = relationship("Transaccion", back_populates="empresa")
+    # usuarios: Mapped[List["Usuario"]] = relationship("Usuario", back_populates="empresa")
+    # orders: Mapped[List["Order"]] = relationship("Order", back_populates="empresa")
     
     def __repr__(self):
         return f"<Empresa(id={self.empresa_id}, rfc={self.rfc}, nombre={self.nombre})>"

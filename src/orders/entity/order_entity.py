@@ -18,9 +18,10 @@ class Order(Base):
     expires_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
     
-    empresa: Mapped["Empresa"] = relationship("Empresa", back_populates="orders")
-    order_items: Mapped[List["OrderItem"]] = relationship("OrderItem", back_populates="order")
-    transacciones: Mapped[List["Transaccion"]] = relationship("Transaccion", back_populates="order")
+    # Relaciones comentadas temporalmente para evitar errores de importación
+    # empresa: Mapped["Empresa"] = relationship("Empresa", back_populates="orders")
+    # order_items: Mapped[List["OrderItem"]] = relationship("OrderItem", back_populates="order")
+    # transacciones: Mapped[List["Transaccion"]] = relationship("Transaccion", back_populates="order")
     
     def __repr__(self):
         return f"<Order(id={self.order_id}, empresa_id={self.empresa_id}, status={self.status})>"

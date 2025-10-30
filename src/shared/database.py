@@ -1,7 +1,3 @@
-"""
-Configuración de Base de Datos Compartida
-SQLAlchemy 2.0 + MySQL
-"""
 
 import os
 from sqlalchemy import create_engine
@@ -47,7 +43,6 @@ SessionLocal = sessionmaker(
 
 
 def get_db():
-    """Dependency para obtener sesión de base de datos"""
     db = SessionLocal()
     try:
         yield db
@@ -57,19 +52,18 @@ def get_db():
 
 def create_tables():
     """Crear todas las tablas en la base de datos"""
-    # Importar todas las entidades para que SQLAlchemy las registre
-    from ..auth.entity.usuario_entity import Usuario
-    from ..auth.entity.rol_entity import Rol
-    from ..auth.entity.usuario_rol_entity import UsuarioRol
-    from ..empresas.entity.empresa_entity import Empresa
-    from ..tokens.entity.token_entity import TokenCO2
-    from ..orders.entity.order_entity import Order
-    from ..orders.entity.order_item_entity import OrderItem
-    from ..transacciones.entity.transaccion_entity import Transaccion
-    from ..transacciones.entity.transaccion_item_entity import TransaccionItem
-    from ..pagos.entity.pago_entity import PagoProductor
-    from ..auditoria.entity.auditoria_entity import AuditLog
-    from ..system.entity.idempotency_key_entity import IdempotencyKey
-    from ..system.entity.outbox_event_entity import OutboxEvent
-    
-    Base.metadata.create_all(bind=engine)
+    try:
+        # Importar solo entidades básicas sin relaciones complejas
+        from src.auth.entity.user_entity import User
+        from src.empresas.entity.empresa_entity import Empresa
+        from src.tokens.entity.token_entity import TokenCO2
+        from src.transacciones.entity.transaccion_entity import Transaccion
+        from src.pagos.entity.pago_entity import PagoProductor
+        from src.auditoria.entity.auditoria_entity import AuditLog
+        
+        # Crear todas las tablas
+        Base.metadata.create_all(bind=engine)
+        print("Base de datos inicializada")
+    except Exception as e:
+        print(f"Error al inicializar base de datos: {e}")
+        raise

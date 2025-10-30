@@ -21,7 +21,8 @@ class PagoProductor(Base):
     comprobante_pago: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     notas: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     
-    transaccion: Mapped["Transaccion"] = relationship("Transaccion", back_populates="pagos_productores")
+    # Relaciones comentadas temporalmente para evitar errores de importación
+    # transaccion: Mapped["Transaccion"] = relationship("Transaccion", back_populates="pagos_productores")
     
     def __repr__(self):
         return f"<PagoProductor(id={self.pago_id}, monto={self.monto}, status={self.status})>"

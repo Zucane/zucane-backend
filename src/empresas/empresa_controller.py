@@ -13,32 +13,6 @@ async def crear_empresa(
     empresa_data: EmpresaCreateDTO,
     db: Session = Depends(get_db)
 ):
-    """
-    ## 🏢 Crear Nueva Empresa
-    
-    Registra una nueva empresa en el sistema para que pueda comprar tokens de CO2.
-    
-    ### Parámetros
-    - **rfc**: RFC de la empresa (13 caracteres)
-    - **nombre**: Nombre de la empresa
-    - **email**: Correo electrónico de contacto
-    - **telefono**: Teléfono de contacto
-    - **direccion**: Dirección física
-    
-    ### Respuesta
-    - **empresa_id**: ID único de la empresa
-    - **rfc**: RFC validado
-    - **nombre**: Nombre de la empresa
-    - **email**: Email de contacto
-    - **telefono**: Teléfono
-    - **direccion**: Dirección
-    - **registro_fecha**: Fecha de registro
-    - **status**: Estado actual (activo/inactivo)
-    
-    ### Errores
-    - **400**: RFC duplicado o datos inválidos
-    - **422**: Error de validación
-    """
     try:
         service = EmpresaService(db)
         return service.crear_empresa(empresa_data)
@@ -94,11 +68,25 @@ async def actualizar_empresa(
     return empresa
 
 
-@router.delete("/{empresa_id}", status_code=204)
+@router.patch("/{empresa_id}/desactivar", response_model=EmpresaResponseDTO)
 async def desactivar_empresa(
     empresa_id: int,
     db: Session = Depends(get_db)
 ):
     service = EmpresaService(db)
-    if not service.desactivar_empresa(empresa_id):
+    empresa = service.desactivar_empresa(empresa_id)
+    if not empresa:
         raise HTTPException(status_code=404, detail="Empresa no encontrada")
+    return empresa
+
+
+@router.patch("/{empresa_id}/activar", response_model=EmpresaResponseDTO)
+async def activar_empresa(
+    empresa_id: int,
+    db: Session = Depends(get_db)
+):
+    service = EmpresaService(db)
+    empresa = service.activar_empresa(empresa_id)
+    if not empresa:
+        raise HTTPException(status_code=404, detail="Empresa no encontrada")
+    return empresa

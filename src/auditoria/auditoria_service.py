@@ -13,7 +13,6 @@ from .auditoria_repository import AuditoriaRepository
 
 
 def _map_audit_log_to_dto(auditoria: AuditLog) -> AuditoriaResponseDTO:
-    """Helper para mapear AuditLog a AuditoriaResponseDTO con compatibilidad"""
     dto_dict = {
         "audit_id": auditoria.audit_id,
         "entity_type": auditoria.entity_type,
@@ -63,7 +62,7 @@ class AuditoriaService:
         auditoria = self.repository.get_by_id(auditoria_id)
         if not auditoria:
             return None
-        return AuditoriaResponseDTO.from_orm(auditoria)
+        return AuditoriaResponseDTO.model_validate(auditoria)
     
     def listar_auditorias_por_transaccion(self, transaccion_id: int, page: int = 1, size: int = 10) -> AuditoriaListDTO:
         skip = (page - 1) * size

@@ -12,20 +12,20 @@ class TokenService:
     
     def emitir_token(self, token_data: TokenCreateDTO) -> TokenResponseDTO:
         token = self.repository.create(token_data)
-        return TokenResponseDTO.from_orm(token)
+        return TokenResponseDTO.model_validate(token)
     
     def obtener_token(self, token_id: int) -> Optional[TokenResponseDTO]:
         token = self.repository.get_by_id(token_id)
         if not token:
             return None
-        return TokenResponseDTO.from_orm(token)
+        return TokenResponseDTO.model_validate(token)
     
     def listar_tokens_disponibles(self, page: int = 1, size: int = 10) -> TokenListDTO:
         skip = (page - 1) * size
         tokens = self.repository.get_available(skip=skip, limit=size)
         total = self.repository.count_by_status("disponible")
         
-        tokens_dto = [TokenResponseDTO.from_orm(token) for token in tokens]
+        tokens_dto = [TokenResponseDTO.model_validate(token) for token in tokens]
         
         return TokenListDTO(
             tokens=tokens_dto,
@@ -39,7 +39,7 @@ class TokenService:
         tokens = self.repository.get_by_status(status, skip=skip, limit=size)
         total = self.repository.count_by_status(status)
         
-        tokens_dto = [TokenResponseDTO.from_orm(token) for token in tokens]
+        tokens_dto = [TokenResponseDTO.model_validate(token) for token in tokens]
         
         return TokenListDTO(
             tokens=tokens_dto,
@@ -56,15 +56,15 @@ class TokenService:
             self.repository.release_tokens([t.token_id for t in tokens])
             raise ValueError("No todos los tokens están disponibles")
         
-        return [TokenResponseDTO.from_orm(token) for token in tokens]
+        return [TokenResponseDTO.model_validate(token) for token in tokens]
     
     def liberar_tokens(self, token_ids: List[int]) -> List[TokenResponseDTO]:
         tokens = self.repository.release_tokens(token_ids)
-        return [TokenResponseDTO.from_orm(token) for token in tokens]
+        return [TokenResponseDTO.model_validate(token) for token in tokens]
     
     def vender_tokens(self, token_ids: List[int]) -> List[TokenResponseDTO]:
         tokens = self.repository.sell_tokens(token_ids)
-        return [TokenResponseDTO.from_orm(token) for token in tokens]
+        return [TokenResponseDTO.model_validate(token) for token in tokens]
     
     def obtener_inventario(self) -> dict:
         return {

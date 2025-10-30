@@ -23,24 +23,24 @@ class PagoService:
         
         # Crear el pago
         pago = self.repository.create(pago_data)
-        return PagoResponseDTO.from_orm(pago)
+        return PagoResponseDTO.model_validate(pago)
     
     def obtener_pago(self, pago_id: int) -> Optional[PagoResponseDTO]:
         pago = self.repository.get_by_id(pago_id)
         if not pago:
             return None
-        return PagoResponseDTO.from_orm(pago)
+        return PagoResponseDTO.model_validate(pago)
     
     def listar_pagos_por_transaccion(self, transaccion_id: int) -> List[PagoResponseDTO]:
         pagos = self.repository.get_by_transaccion(transaccion_id)
-        return [PagoResponseDTO.from_orm(pago) for pago in pagos]
+        return [PagoResponseDTO.model_validate(pago) for pago in pagos]
     
     def listar_pagos_por_status(self, status: str, page: int = 1, size: int = 10) -> PagoListDTO:
         skip = (page - 1) * size
         pagos = self.repository.get_by_status(status, skip=skip, limit=size)
         total = self.repository.count_by_status(status)
         
-        pagos_dto = [PagoResponseDTO.from_orm(pago) for pago in pagos]
+        pagos_dto = [PagoResponseDTO.model_validate(pago) for pago in pagos]
         
         return PagoListDTO(
             pagos=pagos_dto,
@@ -59,17 +59,17 @@ class PagoService:
         if not pago:
             return None
         
-        return PagoResponseDTO.from_orm(pago)
+        return PagoResponseDTO.model_validate(pago)
     
     def actualizar_pago(self, pago_id: int, pago_data: PagoUpdateDTO) -> Optional[PagoResponseDTO]:
         pago = self.repository.update(pago_id, pago_data)
         if not pago:
             return None
-        return PagoResponseDTO.from_orm(pago)
+        return PagoResponseDTO.model_validate(pago)
     
     def obtener_pagos_pendientes(self) -> List[PagoResponseDTO]:
         pagos = self.repository.get_pending_payments()
-        return [PagoResponseDTO.from_orm(pago) for pago in pagos]
+        return [PagoResponseDTO.model_validate(pago) for pago in pagos]
     
     def obtener_resumen_pagos(self) -> dict:
         return {

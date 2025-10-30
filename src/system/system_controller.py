@@ -34,7 +34,6 @@ async def procesar_evento(
 
 @router.get("/health")
 async def health_check():
-    """Health check del sistema"""
     return {
         "status": "healthy",
         "message": "Sistema funcionando correctamente"

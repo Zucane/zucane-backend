@@ -1,11 +1,17 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, validator
 from typing import Optional, List
 from datetime import datetime
 
 
 class LoginRequest(BaseModel):
-    email: EmailStr
+    email: str
     password: str
+    
+    @validator('email')
+    def validate_email(cls, v):
+        if '@' not in v:
+            raise ValueError('Email debe ser válido')
+        return v.lower()
 
 
 class LoginResponse(BaseModel):
@@ -30,15 +36,21 @@ class UserProfile(BaseModel):
 
 class UsuarioCreateDTO(BaseModel):
     empresa_id: Optional[int] = None
-    email: EmailStr
+    email: str
     password: str
     nombre: str
     apellido: str
     telefono: Optional[str] = None
+    
+    @validator('email')
+    def validate_email(cls, v):
+        if '@' not in v:
+            raise ValueError('Email debe ser válido')
+        return v.lower()
 
 
 class UsuarioUpdateDTO(BaseModel):
-    email: Optional[EmailStr] = None
+    email: Optional[str] = None
     nombre: Optional[str] = None
     apellido: Optional[str] = None
     telefono: Optional[str] = None

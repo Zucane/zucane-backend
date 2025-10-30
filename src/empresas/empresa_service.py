@@ -16,26 +16,26 @@ class EmpresaService:
             raise ValueError("Ya existe una empresa con este RFC")
         
         empresa = self.repository.create(empresa_data)
-        return EmpresaResponseDTO.from_orm(empresa)
+        return EmpresaResponseDTO.model_validate(empresa)
     
     def obtener_empresa(self, empresa_id: int) -> Optional[EmpresaResponseDTO]:
         empresa = self.repository.get_by_id(empresa_id)
         if not empresa:
             return None
-        return EmpresaResponseDTO.from_orm(empresa)
+        return EmpresaResponseDTO.model_validate(empresa)
     
     def obtener_empresa_por_rfc(self, rfc: str) -> Optional[EmpresaResponseDTO]:
         empresa = self.repository.get_by_rfc(rfc)
         if not empresa:
             return None
-        return EmpresaResponseDTO.from_orm(empresa)
+        return EmpresaResponseDTO.model_validate(empresa)
     
     def listar_empresas(self, page: int = 1, size: int = 10, status: str = "activo") -> EmpresaListDTO:
         skip = (page - 1) * size
         empresas = self.repository.get_all(skip=skip, limit=size, status=status)
         total = self.repository.count(status=status)
         
-        empresas_dto = [EmpresaResponseDTO.from_orm(empresa) for empresa in empresas]
+        empresas_dto = [EmpresaResponseDTO.model_validate(empresa) for empresa in empresas]
         
         return EmpresaListDTO(
             empresas=empresas_dto,
@@ -48,10 +48,27 @@ class EmpresaService:
         empresa = self.repository.update(empresa_id, empresa_data)
         if not empresa:
             return None
-        return EmpresaResponseDTO.from_orm(empresa)
+        return EmpresaResponseDTO.model_validate(empresa)
     
-    def desactivar_empresa(self, empresa_id: int) -> bool:
-        return self.repository.delete(empresa_id)
+    def desactivar_empresa(self, empresa_id: int) -> Optional[EmpresaResponseDTO]:
+        empresa = self.repository.get_by_id(empresa_id)
+        if not empresa:
+            return None
+        
+        empresa.status = "inactivo"
+        self.repository.db.commit()
+        self.repository.db.refresh(empresa)
+        return EmpresaResponseDTO.model_validate(empresa)
+    
+    def activar_empresa(self, empresa_id: int) -> Optional[EmpresaResponseDTO]:
+        empresa = self.repository.get_by_id(empresa_id)
+        if not empresa:
+            return None
+        
+        empresa.status = "activo"
+        self.repository.db.commit()
+        self.repository.db.refresh(empresa)
+        return EmpresaResponseDTO.model_validate(empresa)
     
     def validar_empresa_activa(self, empresa_id: int) -> bool:
         empresa = self.repository.get_by_id(empresa_id)

@@ -80,7 +80,6 @@ async def actualizar_pago(
 
 @router.get("/pendientes/listar", response_model=List[PagoResponseDTO])
 async def obtener_pagos_pendientes(db: Session = Depends(get_db)):
-    """Obtener pagos pendientes"""
     service = PagoService(db)
     return service.obtener_pagos_pendientes()
 
