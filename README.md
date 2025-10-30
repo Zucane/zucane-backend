@@ -1,237 +1,316 @@
-# Zucane Backend - Stellar Network Integration
+# Zucane Backend - Sistema de Tokens CO2 con Stellar
 
-Este proyecto maneja la integración con la red Stellar para el proyecto Zucane, incluyendo la generación de claves, establecimiento de trustlines y emisión de tokens.
+Sistema completo de gestión de tokens de CO2 con integración real a la red Stellar, arquitectura por dominio y documentación completa.
 
-## 🚀 Características
+## 🚀 Características Principales
 
 - **Arquitectura por Dominio (DDD)** - Organización por entidades de negocio
+- **Integración Real con Stellar** - Transacciones reales en blockchain
 - **SQLAlchemy 2.0 + MySQL** - ORM moderno con base de datos robusta
 - **FastAPI** - Framework web moderno y rápido
-- **Integración Stellar** - Blockchain para transacciones de tokens
-- **Separación de responsabilidades** - Entity, DTO, Repository, Service, Controller
-- **Configuración segura** - Variables de entorno y .gitignore
+- **Documentación Completa** - Swagger con documentación detallada
+- **Sistema de Auditoría** - Trazabilidad completa de transacciones
+- **Autenticación Simple** - Sistema de login básico
+- **Validación Stellar** - Claves públicas validadas en tiempo real
 
-## 📁 Estructura del Proyecto - Arquitectura por Dominio
+## 📁 Estructura del Proyecto
 
 ```
 Zucane-BackEnd/
 ├── src/
-│   ├── __init__.py
-│   ├── config.py              # Configuración Stellar (legacy)
-│   ├── 0_generate_keys.py     # Generador de claves Stellar
-│   ├── stellar_setup.py       # Setup principal de Stellar
-│   ├── empresas/              # Dominio: Empresas
-│   │   ├── __init__.py
-│   │   ├── dto/
-│   │   │   ├── __init__.py
-│   │   │   └── empresa_dto.py # Data Transfer Objects
+│   ├── auth/                      # Dominio: Autenticación
 │   │   ├── entity/
-│   │   │   ├── __init__.py
-│   │   │   └── empresa_entity.py # Entidad Empresa
-│   │   ├── empresa_repository.py # Acceso a datos
-│   │   ├── empresa_service.py    # Lógica de negocio
-│   │   └── empresa_controller.py # Endpoints REST
-│   ├── tokens/                # Dominio: Tokens CO2
-│   │   ├── __init__.py
+│   │   │   └── user_entity.py     # Entidad Usuario
 │   │   ├── dto/
-│   │   │   ├── __init__.py
-│   │   │   └── token_dto.py
-│   │   ├── entity/
-│   │   │   ├── __init__.py
-│   │   │   └── token_entity.py
-│   │   ├── token_repository.py
-│   │   ├── token_service.py
-│   │   └── token_controller.py
-│   ├── transacciones/         # Dominio: Transacciones
-│   │   ├── __init__.py
+│   │   │   └── auth_dto.py        # DTOs de autenticación
+│   │   └── auth_controller.py     # Endpoints de login
+│   ├── empresas/                  # Dominio: Empresas
 │   │   ├── dto/
-│   │   │   ├── __init__.py
-│   │   │   └── transaccion_dto.py
+│   │   │   └── empresa_dto.py     # DTOs con validación Stellar
 │   │   ├── entity/
-│   │   │   ├── __init__.py
-│   │   │   └── transaccion_entity.py
-│   │   ├── transaccion_repository.py
-│   │   ├── transaccion_service.py
-│   │   └── transaccion_controller.py
-│   ├── pagos/                 # Dominio: Pagos
-│   │   ├── __init__.py
+│   │   │   └── empresa_entity.py  # Entidad Empresa
+│   │   ├── empresa_repository.py  # Acceso a datos
+│   │   ├── empresa_service.py     # Lógica de negocio
+│   │   └── empresa_controller.py  # Endpoints REST
+│   ├── tokens/                    # Dominio: Tokens CO2
 │   │   ├── dto/
-│   │   │   ├── __init__.py
-│   │   │   └── pago_dto.py
+│   │   │   └── token_dto.py       # DTOs con validación Stellar
 │   │   ├── entity/
-│   │   │   ├── __init__.py
-│   │   │   └── pago_entity.py
-│   │   ├── pago_repository.py
-│   │   ├── pago_service.py
-│   │   └── pago_controller.py
-│   ├── auditoria/             # Dominio: Auditoría
-│   │   ├── __init__.py
+│   │   │   └── token_entity.py    # Entidad Token
+│   │   ├── token_repository.py    # Acceso a datos
+│   │   ├── token_service.py       # Lógica de negocio
+│   │   └── token_controller.py    # Endpoints REST
+│   ├── transacciones/             # Dominio: Transacciones
 │   │   ├── dto/
-│   │   │   ├── __init__.py
-│   │   │   └── auditoria_dto.py
+│   │   │   └── transaccion_dto.py # DTOs de transacciones
 │   │   ├── entity/
-│   │   │   ├── __init__.py
-│   │   │   └── auditoria_entity.py
-│   │   ├── auditoria_repository.py
-│   │   ├── auditoria_service.py
-│   │   └── auditoria_controller.py
-│   └── shared/                # Configuración compartida
-│       ├── __init__.py
-│       ├── database.py        # SQLAlchemy 2.0 + MySQL
-│       └── config.py          # Configuración global
-├── .env                       # Variables de entorno (NO committear)
-├── .gitignore                 # Archivos a ignorar en Git
-├── requirements.txt           # Dependencias de Python
-├── main.py                    # Punto de entrada Stellar (legacy)
-├── app.py                     # Aplicación FastAPI con arquitectura por dominio
-└── README.md                  # Este archivo
+│   │   │   └── transaccion_entity.py # Entidad Transacción
+│   │   ├── transaccion_repository.py # Acceso a datos
+│   │   ├── transaccion_service.py    # Lógica de negocio
+│   │   └── transaccion_controller.py # Endpoints REST + Stellar
+│   ├── pagos/                     # Dominio: Pagos
+│   │   ├── dto/
+│   │   │   └── pago_dto.py        # DTOs de pagos
+│   │   ├── entity/
+│   │   │   └── pago_entity.py     # Entidad Pago
+│   │   ├── pago_repository.py     # Acceso a datos
+│   │   ├── pago_service.py        # Lógica de negocio
+│   │   └── pago_controller.py     # Endpoints REST
+│   ├── auditoria/                 # Dominio: Auditoría
+│   │   ├── dto/
+│   │   │   └── auditoria_dto.py   # DTOs de auditoría
+│   │   ├── entity/
+│   │   │   └── auditoria_entity.py # Entidad Auditoría
+│   │   ├── auditoria_repository.py # Acceso a datos
+│   │   ├── auditoria_service.py     # Lógica de negocio
+│   │   └── auditoria_controller.py  # Endpoints REST
+│   ├── stellar/                   # Integración Stellar
+│   │   └── stellar_service.py     # Servicio Stellar real
+│   ├── payments/                  # Pagos Stellar
+│   │   ├── dto/
+│   │   │   └── payment_dto.py     # DTOs de pagos Stellar
+│   │   ├── payment_service.py     # Servicio de pagos
+│   │   └── payment_controller.py  # Endpoints de pagos
+│   └── shared/                    # Configuración compartida
+│       ├── database.py            # SQLAlchemy 2.0 + MySQL
+│       ├── config.py              # Configuración global
+│       └── auth.py                # Utilidades de autenticación
+├── .env                           # Variables de entorno
+├── requirements.txt               # Dependencias de Python
+├── app.py                        # Aplicación FastAPI principal
+├── setup_database.py             # Script de configuración de BD
+└── README.md                     # Este archivo
 ```
 
 ## 🛠️ Instalación
 
-1. **Clonar el repositorio:**
-   ```bash
-   git clone <url-del-repositorio>
-   cd Zucane-BackEnd
-   ```
+### 1. Clonar el repositorio
+```bash
+git clone <url-del-repositorio>
+cd Zucane-BackEnd
+```
 
-2. **Crear un entorno virtual:**
-   ```bash
-   python -m venv venv
-   # En Windows:
-   venv\Scripts\activate
-   # En Linux/Mac:
-   source venv/bin/activate
-   ```
+### 2. Crear entorno virtual
+```bash
+python -m venv venv
+# Windows:
+venv\Scripts\activate
+# Linux/Mac:
+source venv/bin/activate
+```
 
-3. **Instalar dependencias:**
-   ```bash
-   pip install -r requirements.txt
-   ```
+### 3. Instalar dependencias
+```bash
+pip install -r requirements.txt
+```
 
-4. **Configurar variables de entorno:**
-   - Crea un archivo `.env` con las siguientes variables:
-   ```env
-   # Stellar Network Credentials
-   GOVERNMENT_PUBLIC_KEY=tu_clave_publica_government
-   GOVERNMENT_SECRET_KEY=tu_clave_secreta_government
-   TREASURY_PUBLIC_KEY=tu_clave_publica_treasury
-   TREASURY_SECRET_KEY=tu_clave_secreta_treasury
-   ASSET_NAME=XOCHI
-   HORIZON_URL=https://horizon-testnet.stellar.org
-   
-   # Database Configuration
-   DB_HOST=localhost
-   DB_PORT=3306
-   DB_USER=user
-   DB_PASSWORD=pass
-   DB_NAME=zucane_db
-   ```
+### 4. Configurar variables de entorno
+Crear archivo `.env`:
+```env
+# Base de datos
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=user
+DB_PASSWORD=pass
+DB_NAME=zucane_db
+```
 
-5. **Configurar base de datos MySQL:**
-   - Instalar MySQL 8.0
-   - Crear la base de datos `zucane_db`
-   - Configurar usuario y contraseña según el `.env`
+### 5. Configurar base de datos
+```bash
+# Crear base de datos MySQL
+mysql -u root -p
+CREATE DATABASE zucane_db;
+CREATE USER 'user'@'localhost' IDENTIFIED BY 'pass';
+GRANT ALL PRIVILEGES ON zucane_db.* TO 'user'@'localhost';
+FLUSH PRIVILEGES;
+EXIT;
+
+# Ejecutar setup de base de datos
+python setup_database.py
+```
 
 ## 🎯 Uso
 
-### 1. Generar Claves (Solo la primera vez)
-
+### 1. Ejecutar la aplicación
 ```bash
-python src/0_generate_keys.py
-```
-
-Este script generará las claves de Government y Treasury, y las activará en la red de prueba de Stellar. **IMPORTANTE**: Guarda estas claves en tu archivo `.env`.
-
-### 2. Ejecutar Setup Principal
-
-```bash
-# Stellar Network (legacy)
-python main.py
-
-# FastAPI con arquitectura por dominio
 python app.py
 ```
 
-### 3. Acceder a la Documentación Swagger
+### 2. Acceder a la documentación
+- **Swagger UI**: `http://localhost:8000/docs`
+- **ReDoc**: `http://localhost:8000/redoc`
+- **OpenAPI JSON**: `http://localhost:8000/openapi.json`
 
-Una vez ejecutando `python app.py`, puedes acceder a:
+## 📚 API Endpoints
 
-- **Swagger UI**: `http://localhost:8000/docs` 📚
-- **ReDoc**: `http://localhost:8000/redoc` 📖
-- **OpenAPI JSON**: `http://localhost:8000/openapi.json` 🔧
+### 🔐 Autenticación
+- `POST /api/v1/auth/login` - Iniciar sesión
+- `GET /api/v1/auth/profile/{user_id}` - Obtener perfil
+- `POST /api/v1/auth/logout` - Cerrar sesión
 
-### 4. Endpoints Principales
+### 🏢 Empresas
+- `POST /api/v1/empresas/` - Crear empresa
+- `GET /api/v1/empresas/{id}` - Obtener empresa
+- `GET /api/v1/empresas/rfc/{rfc}` - Buscar por RFC
+- `GET /api/v1/empresas/` - Listar empresas
+- `PUT /api/v1/empresas/{id}` - Actualizar empresa
+- `PATCH /api/v1/empresas/{id}/activar` - Activar empresa
+- `PATCH /api/v1/empresas/{id}/desactivar` - Desactivar empresa
 
-- **Health Check**: `GET /health`
-- **Empresas**: `GET /api/v1/empresas/`
-- **Tokens**: `GET /api/v1/tokens/`
-- **Transacciones**: `GET /api/v1/transacciones/`
-- **Pagos**: `GET /api/v1/pagos/`
-- **Auditoría**: `GET /api/v1/auditoria/`
+### 🪙 Tokens CO2
+- `POST /api/v1/tokens/` - Emitir token
+- `GET /api/v1/tokens/{id}` - Obtener token
+- `GET /api/v1/tokens/` - Listar tokens disponibles
+- `GET /api/v1/tokens/status/{status}` - Filtrar por status
+- `POST /api/v1/tokens/reservar` - Reservar tokens
+- `POST /api/v1/tokens/liberar` - Liberar tokens
+- `POST /api/v1/tokens/vender` - Marcar como vendidos
+- `GET /api/v1/tokens/inventario/summary` - Resumen de inventario
 
-## 📚 Documentación Swagger
+### 💰 Transacciones
+- `POST /api/v1/transacciones/` - Crear transacción
+- `GET /api/v1/transacciones/{id}` - Obtener transacción
+- `GET /api/v1/transacciones/empresa/{id}` - Por empresa
+- `GET /api/v1/transacciones/status/{status}` - Por status
+- `POST /api/v1/transacciones/{id}/confirmar` - Confirmar
+- `POST /api/v1/transacciones/{id}/fallar` - Marcar como fallida
+- `GET /api/v1/transacciones/pendientes/procesar` - Procesar pendientes
 
-FastAPI incluye automáticamente documentación interactiva con Swagger UI:
+### 🌟 Pagos Stellar
+- `POST /api/v1/transacciones/stellar/pagar` - Pagar con Stellar
+- `POST /api/v1/transacciones/stellar/verificar` - Verificar pago
+- `POST /api/v1/transacciones/stellar/balance` - Consultar balance
+- `POST /api/v1/payments/process` - Procesar pago directo
+- `POST /api/v1/payments/verify` - Verificar pago directo
+- `POST /api/v1/payments/balance` - Balance de empresa
+- `GET /api/v1/payments/stellar/info` - Información Stellar
 
-### 🎯 Características de Swagger
+### 💳 Pagos a Productores
+- `POST /api/v1/pagos/` - Crear pago
+- `GET /api/v1/pagos/{id}` - Obtener pago
+- `GET /api/v1/pagos/transaccion/{id}` - Por transacción
+- `GET /api/v1/pagos/status/{status}` - Por status
+- `POST /api/v1/pagos/{id}/completar` - Completar pago
+- `PUT /api/v1/pagos/{id}` - Actualizar pago
+- `GET /api/v1/pagos/pendientes/listar` - Listar pendientes
+- `GET /api/v1/pagos/resumen/summary` - Resumen estadístico
 
-- **Documentación Automática**: Generada automáticamente desde el código
-- **Interfaz Interactiva**: Prueba los endpoints directamente desde el navegador
-- **Validación en Tiempo Real**: Valida los datos antes de enviar
-- **Esquemas de Datos**: Ve la estructura de los DTOs y respuestas
-- **Códigos de Error**: Documentación completa de errores posibles
+### 📊 Auditoría
+- `POST /api/v1/auditoria/` - Crear auditoría
+- `GET /api/v1/auditoria/{id}` - Obtener auditoría
+- `GET /api/v1/auditoria/transaccion/{id}` - Por transacción
+- `GET /api/v1/auditoria/usuario/{id}` - Por usuario
+- `POST /api/v1/auditoria/buscar` - Buscar con filtros
+- `GET /api/v1/auditoria/` - Listar todas
+- `PUT /api/v1/auditoria/{id}` - Actualizar auditoría
+- `POST /api/v1/auditoria/registrar` - Registrar acción rápida
+- `GET /api/v1/auditoria/resumen/summary` - Resumen estadístico
 
-### 🔧 URLs de Documentación
+## 🌟 Integración Stellar
 
-| URL | Descripción |
-|-----|-------------|
-| `http://localhost:8000/docs` | Swagger UI (Interfaz principal) |
-| `http://localhost:8000/redoc` | ReDoc (Documentación alternativa) |
-| `http://localhost:8000/openapi.json` | Esquema OpenAPI en JSON |
+### Características
+- **Validación Real**: Claves Stellar validadas con `stellar_sdk.StrKey`
+- **Transacciones Reales**: Pagos procesados en la red Stellar
+- **Verificación Automática**: Confirmación de transacciones
+- **Consultas de Balance**: Balance real de cuentas Stellar
+- **Manejo de Errores**: Gestión robusta de errores de red
 
-### 📋 Cómo usar Swagger
+### Flujo de Transacción
+1. **Crear Transacción** → Status: "pendiente"
+2. **Reservar Token** → Status: "reservado"
+3. **Procesar Pago Stellar** → Pago real en blockchain
+4. **Verificar Pago** → Confirmación en Stellar
+5. **Confirmar Transacción** → Status: "confirmada"
+6. **Marcar Token Vendido** → Status: "vendido"
 
-1. **Ejecuta la aplicación**: `python app.py`
-2. **Abre el navegador**: Ve a `http://localhost:8000/docs`
-3. **Explora los endpoints**: Cada dominio tiene su sección
-4. **Prueba las APIs**: Haz clic en "Try it out" en cualquier endpoint
-5. **Envía datos**: Completa los campos y ejecuta la petición
+### Configuración Stellar
+- **Red**: Testnet (desarrollo)
+- **Asset**: XOCHI
+- **Gobierno**: GBL44HGF3K7NLLCIKIEILGVHMASXB7QAZROZU2XISRFOJG6R4GNWZ6RY
+- **Tesorería**: GCTWI7YUCLHG2KAYZPN2VZGLKXITW474P2CMP2UJTTH56PGDL72YLLNZ
 
-### 🏷️ Tags Organizados
+## 📋 Documentación Swagger
 
-- **empresas**: Gestión de empresas compradoras
-- **tokens**: Tokens de CO2 emitidos
-- **transacciones**: Compras de tokens
-- **pagos**: Pagos a productores
-- **auditoria**: Registros de auditoría
-- **health**: Estado del sistema
+### Características
+- **Documentación Completa**: Cada endpoint documentado
+- **Interfaz Interactiva**: Prueba endpoints desde el navegador
+- **Validación en Tiempo Real**: Valida datos antes de enviar
+- **Esquemas de Datos**: Estructura completa de DTOs
+- **Códigos de Error**: Documentación de errores posibles
+
+### Estructura de Documentación
+Cada endpoint incluye:
+- **TÍTULO** - Nombre claro del endpoint
+- **QUE HACE** - Lista de acciones que realiza
+- **COMO USAR** - Pasos numerados para usar el endpoint
+- **RESPUESTA** - Campos que devuelve
 
 ## 🔒 Seguridad
 
-- **NUNCA** commitees el archivo `.env` al repositorio
-- Las claves secretas son sensibles, mantenlas seguras
-- Usa la red de prueba para desarrollo
-- Cambia a mainnet solo cuando estés listo para producción
+- **Variables de Entorno**: Configuración segura
+- **Validación Stellar**: Claves públicas validadas
+- **Autenticación**: Sistema de login básico
+- **Auditoría**: Trazabilidad completa
+- **Base de Datos**: Transacciones ACID
 
-## 📚 Dependencias
+## 📚 Dependencias Principales
 
-- `stellar-sdk`: SDK oficial de Stellar
-- `requests`: Para peticiones HTTP
-- `python-dotenv`: Para cargar variables de entorno
+- `fastapi` - Framework web moderno
+- `sqlalchemy` - ORM para base de datos
+- `mysqlclient` - Driver MySQL
+- `stellar-sdk` - SDK oficial de Stellar
+- `pydantic` - Validación de datos
+- `uvicorn` - Servidor ASGI
+- `python-dotenv` - Variables de entorno
 
-## 📝 Notas
+## 🚀 Flujo de Trabajo
 
-- Este proyecto usa la red de prueba de Stellar por defecto
-- Las claves se generan automáticamente la primera vez
-- El archivo `.env` está incluido en `.gitignore` por seguridad
-- La estructura `src/` mantiene el código organizado y profesional
+### 1. Configuración Inicial
+```bash
+# 1. Instalar dependencias
+pip install -r requirements.txt
+
+# 2. Configurar base de datos
+python setup_database.py
+
+# 3. Ejecutar aplicación
+python app.py
+```
+
+### 2. Uso Básico
+1. **Acceder a Swagger**: `http://localhost:8000/docs`
+2. **Crear empresa** con clave Stellar válida
+3. **Emitir tokens** de CO2
+4. **Crear transacción** de compra
+5. **Procesar pago** con Stellar
+6. **Verificar transacción** en blockchain
+
+### 3. Monitoreo
+- **Auditoría**: Todos los cambios registrados
+- **Logs**: Trazabilidad completa
+- **Swagger**: Documentación interactiva
+- **Base de Datos**: Estado persistente
 
 ## 🤝 Contribución
 
 1. Fork el proyecto
-2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
-3. Commit tus cambios (`git commit -m 'add: some AmazingFeature'`)
-4. Push a la rama (`git push origin feature/AmazingFeature`)
+2. Crea una rama (`git checkout -b feature/nueva-funcionalidad`)
+3. Commit tus cambios (`git commit -m 'add: nueva funcionalidad'`)
+4. Push a la rama (`git push origin feature/nueva-funcionalidad`)
 5. Abre un Pull Request
 
+## 📝 Notas
+
+- **Stellar Testnet**: Usa red de prueba para desarrollo
+- **Claves Configuradas**: Ya incluye claves válidas para testing
+- **Documentación Completa**: Cada endpoint está documentado
+- **Arquitectura Limpia**: Separación clara de responsabilidades
+- **Integración Real**: No es simulación, es integración real con Stellar
+
+## 🎯 Próximos Pasos
+
+- [ ] Implementar autenticación JWT completa
+- [ ] Agregar tests unitarios
+- [ ] Implementar rate limiting
+- [ ] Agregar métricas y monitoreo
+- [ ] Migrar a Stellar Mainnet para producción
