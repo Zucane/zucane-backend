@@ -9,7 +9,7 @@ class Empresa(Base):
     __tablename__ = "empresas"
     
     empresa_id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    rfc: Mapped[str] = mapped_column(String(20), unique=True, index=True, nullable=False)  # Aumentado para soportar diferentes longitudes de RFC
+    rfc: Mapped[str] = mapped_column(String(20), unique=True, index=True, nullable=False)  # Soporta RFCs de 12-13 caracteres
     nombre: Mapped[str] = mapped_column(String(255), nullable=False)
     email: Mapped[str] = mapped_column(String(255), nullable=False)
     telefono: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
@@ -22,7 +22,7 @@ class Empresa(Base):
     )
     
     stellar_public_key: Mapped[str] = mapped_column(String(56), nullable=False, unique=True, index=True)
-    stellar_secret_key: Mapped[str] = mapped_column(String(56), nullable=False)  # Clave secreta generada
+    stellar_secret_key: Mapped[str] = mapped_column(String(56), nullable=False)
     
     # Relaciones comentadas temporalmente para evitar errores de importación
     # transacciones: Mapped[List["Transaccion"]] = relationship("Transaccion", back_populates="empresa")

@@ -206,7 +206,7 @@ SELECT * FROM tokens_co2;
 - Rol: `GOV_ADMIN`
 
 **Empresa de Prueba:**
-- RFC: `ABC21024897` (persona moral - 12 caracteres)
+- RFC: `ABC123456789`
 - Nombre: `Empresa de Prueba S.A. de C.V.`
 - Email: `contacto@empresaprueba.com`
 - **Claves Stellar**: Se generan automáticamente al crear la empresa

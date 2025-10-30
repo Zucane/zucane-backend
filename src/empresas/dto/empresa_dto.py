@@ -7,13 +7,14 @@ class EmpresaCreateDTO(BaseModel):
     rfc: str
     nombre: str
     email: str
+    password: str
     telefono: Optional[str] = None
     direccion: Optional[str] = None
     # stellar_public_key se genera automáticamente
     
     @validator('rfc')
     def validate_rfc(cls, v):
-        # Validación básica: solo verificar que no esté vacío
+        # Solo validación básica - el frontend maneja la validación específica
         if not v or len(v.strip()) == 0:
             raise ValueError('RFC es requerido')
         return v.upper().strip()

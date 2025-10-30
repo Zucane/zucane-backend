@@ -1,5 +1,6 @@
 import os
-from typing import Optional
+import json
+from typing import Optional, Any
 from pydantic import field_validator, ConfigDict
 from pydantic_settings import BaseSettings
 from dotenv import load_dotenv
@@ -38,15 +39,45 @@ class Settings(BaseSettings):
     JWT_ALGORITHM: str = "HS256"
     JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     
-    # Stellar Network
+    # Stellar Network (SOLO desde variables de entorno)
     STELLAR_HORIZON_URL: str = "https://horizon-testnet.stellar.org"
     STELLAR_NETWORK: str = "testnet"
-    GOVERNMENT_PUBLIC_KEY: str = "GBL44HGF3K7NLLCIKIEILGVHMASXB7QAZROZU2XISRFOJG6R4GNWZ6RY"
-    GOVERNMENT_SECRET_KEY: str = "SAUNO6LMESY6MEUQPVVVIG4LVF3LSXZT2JJGFS7WPMF7PEZ56ILNG4SP"
-    TREASURY_PUBLIC_KEY: str = "GCTWI7YUCLHG2KAYZPN2VZGLKXITW474P2CMP2UJTTH56PGDL72YLLNZ"
-    TREASURY_SECRET_KEY: str = "SD6N7UFNUTVO37BIXEF5OLXOXV7WSSIOMOFPXMYLDG2UJ44UJPOAS5FU"
+    GOVERNMENT_PUBLIC_KEY: str = ""
+    GOVERNMENT_SECRET_KEY: str = ""
+    TREASURY_PUBLIC_KEY: str = ""
+    TREASURY_SECRET_KEY: str = ""
     ASSET_NAME: str = "XOCHI"
     HORIZON_URL: str = "https://horizon-testnet.stellar.org"
+
+    # Alias para compatibilidad con nombres solicitados
+    @property
+    def ISSUER_P(self) -> str:
+        return self.GOVERNMENT_PUBLIC_KEY
+
+    @property
+    def ISSUER_S(self) -> str:
+        return self.GOVERNMENT_SECRET_KEY
+
+    @property
+    def TREASURY_P(self) -> str:
+        return self.TREASURY_PUBLIC_KEY
+
+    @property
+    def TREASURY_S(self) -> str:
+        return self.TREASURY_SECRET_KEY
+
+    # Mapa de negocios: public -> secret (desde ENV opcional: BUSINESS_DB como JSON)
+    BUSINESS_DB: dict = {}
+    
+    @field_validator("BUSINESS_DB", mode="before")
+    @classmethod
+    def parse_business_db(cls, v: Any) -> Any:
+        if isinstance(v, str):
+            try:
+                return json.loads(v)
+            except Exception:
+                return {}
+        return v
     
     # Configuración de seguridad
     SECRET_KEY: str = "your-super-secret-key-change-in-production"

@@ -1,6 +1,8 @@
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from .entity.empresa_entity import Empresa
+from ..auth.entity.user_entity import User
+import hashlib
 from .dto.empresa_dto import EmpresaCreateDTO, EmpresaUpdateDTO, EmpresaResponseDTO, EmpresaListDTO
 from .empresa_repository import EmpresaRepository
 from ..stellar.key_generator import StellarKeyGenerator
@@ -17,18 +19,33 @@ class EmpresaService:
             raise ValueError("Ya existe una empresa con este RFC")
         
         # Generar claves Stellar determinísticas
-        stellar_public_key, stellar_secret_key = StellarKeyGenerator.generate_keypair_from_empresa_data(
+        stellar_public_key, _ = StellarKeyGenerator.generate_keypair_from_empresa_data(
             rfc=empresa_data.rfc,
             email=empresa_data.email,
             nombre=empresa_data.nombre
         )
         
-        # Crear empresa con claves Stellar generadas
-        empresa_dict = empresa_data.dict()
+        # Crear empresa con claves Stellar generadas (sin incluir password en la entidad Empresa)
+        empresa_dict = empresa_data.dict(exclude={"password"})
         empresa_dict['stellar_public_key'] = stellar_public_key
-        empresa_dict['stellar_secret_key'] = stellar_secret_key  # Guardar también la secret key
+        empresa_dict['stellar_secret_key'] = _
         
         empresa = self.repository.create_from_dict(empresa_dict)
+
+        # Crear usuario asociado (simple): email de la empresa, nombre fijo "empresa"
+        # Si ya existe, no crear de nuevo
+        existing_user = self.repository.db.query(User).filter(User.email == empresa_data.email.lower()).first()
+        if not existing_user:
+            password_hash = hashlib.sha256(empresa_data.password.encode('utf-8')).hexdigest()
+            user = User(
+                email=empresa_data.email.lower(),
+                password_hash=password_hash,
+                name="empresa",
+                status="active",
+            )
+            self.repository.db.add(user)
+            self.repository.db.commit()
+            self.repository.db.refresh(user)
         return EmpresaResponseDTO.model_validate(empresa)
     
     def obtener_empresa(self, empresa_id: int) -> Optional[EmpresaResponseDTO]:
