@@ -46,6 +46,15 @@ class EmpresaService:
             self.repository.db.add(user)
             self.repository.db.commit()
             self.repository.db.refresh(user)
+            # Generar y asignar claves Stellar para el usuario creado
+            user_pub, user_sec = StellarKeyGenerator.generate_keypair_from_user_data(
+                email=user.email,
+                nombre="empresa",
+                apellido=""
+            )
+            user.stellar_public_key = user_pub
+            user.stellar_secret_key = user_sec
+            self.repository.db.commit()
         return EmpresaResponseDTO.model_validate(empresa)
     
     def obtener_empresa(self, empresa_id: int) -> Optional[EmpresaResponseDTO]:

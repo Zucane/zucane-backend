@@ -105,7 +105,7 @@ async def obtener_balance_empresa(
     
     QUE HACE:
     - Busca empresa por ID
-    - Consulta balance XOCHI
+    - Consulta balance del asset configurado
     - Consulta balance XLM
     - Verifica cuenta existe
     
@@ -116,7 +116,7 @@ async def obtener_balance_empresa(
     
     RESPUESTA:
     - success: true/false
-    - xochi_balance: Balance XOCHI
+    - xochi_balance: Balance del asset
     - xlm_balance: Balance XLM
     - account_exists: true si existe
     """
@@ -150,7 +150,7 @@ async def obtener_info_stellar():
     RESPUESTA:
     - horizon_url: URL de Horizon
     - network: testnet/mainnet
-    - asset_name: XOCHI
+    - asset_name: ZUCOIN
     - government_public_key: Clave del gobierno
     - treasury_public_key: Clave de tesoreria
     """

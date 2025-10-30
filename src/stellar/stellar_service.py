@@ -39,7 +39,7 @@ class StellarService:
         from_secret: str, 
         to_public: str, 
         amount: float, 
-        asset_code: str = "XOCHI",
+        asset_code: str = "ZUCOIN",
         issuer_public: str = None
     ) -> Optional[Dict[str, Any]]:
         """Crear transacción de pago en Stellar"""
@@ -124,7 +124,7 @@ class StellarService:
             logger.error(f"Error al verificar transacción {transaction_hash}: {e}")
             return {"success": False, "error": str(e)}
     
-    def get_account_balance(self, public_key: str, asset_code: str = "XOCHI") -> float:
+    def get_account_balance(self, public_key: str, asset_code: str = "ZUCOIN") -> float:
         """Obtener balance de una cuenta para un asset específico"""
         try:
             account = self.server.accounts().account_id(public_key).call()

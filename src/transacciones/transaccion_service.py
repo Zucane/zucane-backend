@@ -124,8 +124,8 @@ class TransaccionService:
             # Actualizar transacción con datos de Stellar
             updated_transaccion = self.repository.confirm_transaction(
                 transaccion_id,
-                payment_result["transaction_hash"],
-                "XOCHI"  # Asset code
+                  payment_result["transaction_hash"],
+                  settings.ASSET_NAME  # Asset code
             )
             
             if updated_transaccion:

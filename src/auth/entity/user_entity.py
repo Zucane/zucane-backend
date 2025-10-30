@@ -18,6 +18,8 @@ class User(Base):
         nullable=False
     )
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+    stellar_public_key: Mapped[str | None] = mapped_column(String(56), nullable=True, unique=True, index=True)
+    stellar_secret_key: Mapped[str | None] = mapped_column(String(56), nullable=True)
     
     def __repr__(self):
         return f"<User(id={self.id}, email={self.email})>"

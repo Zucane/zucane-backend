@@ -326,7 +326,7 @@ async def obtener_balance_empresa_stellar(
     
     QUE HACE:
     - Busca la empresa por ID
-    - Consulta balance XOCHI en Stellar
+    - Consulta balance del asset en Stellar
     - Consulta balance XLM en Stellar
     - Verifica que la cuenta existe
     
@@ -337,7 +337,7 @@ async def obtener_balance_empresa_stellar(
     
     RESPUESTA:
     - success: true/false
-    - xochi_balance: Balance de tokens XOCHI
+    - xochi_balance: Balance de tokens del asset
     - xlm_balance: Balance de XLM
     - account_exists: true si la cuenta existe
     """

@@ -4,6 +4,9 @@ from datetime import datetime
 from ..shared.database import get_db
 from .entity.user_entity import User
 from pydantic import BaseModel
+from ..stellar.key_generator import StellarKeyGenerator
+from sqlalchemy import text
+from ..empresas.entity.empresa_entity import Empresa
 
 router = APIRouter(prefix="/auth", tags=["autenticación"])
 
@@ -18,6 +21,7 @@ class LoginResponse(BaseModel):
     message: str
     user_id: int
     email: str
+    stellar_public_key: str | None = None
 
 
 class UserProfile(BaseModel):
@@ -75,12 +79,16 @@ async def login(login_data: LoginRequest, db: Session = Depends(get_db)):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Usuario inactivo"
         )
+
+    empresa = db.query(Empresa).filter(Empresa.email == user.email).first()
+    stellar_public_key = empresa.stellar_public_key if empresa else None
     
     return LoginResponse(
         success=True,
         message="Login exitoso",
         user_id=user.id,
-        email=user.email
+        email=user.email,
+        stellar_public_key=stellar_public_key
     )
 
 
@@ -145,3 +153,56 @@ async def logout():
     - message: "Logout exitoso"
     """
     return {"message": "Logout exitoso"}
+
+
+@router.post("/reset-admin")
+async def reset_admin(db: Session = Depends(get_db)):
+    """
+    Elimina y recrea el usuario admin@gobierno.mx con claves Stellar generadas.
+    """
+    admin_email = "admin@gobierno.mx"
+
+    # Asegurar columnas nuevas en DB antes de cualquier consulta ORM
+    col = db.execute(text("SHOW COLUMNS FROM users LIKE 'stellar_public_key'"))
+    if not col.first():
+        db.execute(text("ALTER TABLE users ADD COLUMN stellar_public_key VARCHAR(56) NULL UNIQUE"))
+        db.commit()
+    col = db.execute(text("SHOW COLUMNS FROM users LIKE 'stellar_secret_key'"))
+    if not col.first():
+        db.execute(text("ALTER TABLE users ADD COLUMN stellar_secret_key VARCHAR(56) NULL"))
+        db.commit()
+
+    # Borrar si existe
+    existing = db.query(User).filter(User.email == admin_email).first()
+    if existing:
+        db.delete(existing)
+        db.commit()
+
+    # Crear nuevo admin
+    import hashlib
+    password_hash = hashlib.sha256("admin123".encode('utf-8')).hexdigest()
+    user = User(
+        email=admin_email,
+        password_hash=password_hash,
+        name="Admin",
+        status="active",
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+
+    # Generar claves Stellar para el admin
+    pub, sec = StellarKeyGenerator.generate_keypair_from_user_data(
+        email=user.email,
+        nombre="Admin",
+        apellido=""
+    )
+    user.stellar_public_key = pub
+    user.stellar_secret_key = sec
+    db.commit()
+
+    return {
+        "message": "Admin recreado",
+        "email": user.email,
+        "stellar_public_key": user.stellar_public_key
+    }

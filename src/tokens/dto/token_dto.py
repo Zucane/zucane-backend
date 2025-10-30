@@ -8,7 +8,7 @@ from stellar_sdk import StrKey
 class TokenCreateDTO(BaseModel):
     cantidad_co2: Decimal
     status: str = "disponible"
-    asset_code: str = "XOCHI"
+    asset_code: str = "ZUCOIN"
     issuer_pubkey: str
     dist_pubkey: str
     

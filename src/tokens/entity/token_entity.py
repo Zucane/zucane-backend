@@ -17,7 +17,7 @@ class TokenCO2(Base):
         nullable=False
     )
     
-    asset_code: Mapped[str] = mapped_column(String(20), default="XOCHI", nullable=False)
+    asset_code: Mapped[str] = mapped_column(String(20), default="ZUCOIN", nullable=False)
     issuer_pubkey: Mapped[str] = mapped_column(String(56), nullable=False)  # GOVERNMENT_PUBLIC_KEY
     dist_pubkey: Mapped[str] = mapped_column(String(56), nullable=False)    # TREASURY_PUBLIC_KEY
     

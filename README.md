@@ -218,7 +218,7 @@ SELECT * FROM tokens_co2;
 **Tokens de Prueba:**
 - 3 tokens de 1.0 tonelada CO2 cada uno
 - Status: `disponible`
-- Asset: `XOCHI`
+- Asset: `ZUCOIN`
 
 #### 5.5 Estructura de tablas creadas
 
@@ -456,7 +456,7 @@ El sistema genera automáticamente claves Stellar únicas para cada empresa bas�
 
 ### Configuración Stellar
 - **Red**: Testnet (desarrollo)
-- **Asset**: XOCHI
+- **Asset**: ZUCOIN
 - **Gobierno**: GBL44HGF3K7NLLCIKIEILGVHMASXB7QAZROZU2XISRFOJG6R4GNWZ6RY
 - **Tesorería**: GCTWI7YUCLHG2KAYZPN2VZGLKXITW474P2CMP2UJTTH56PGDL72YLLNZ
 

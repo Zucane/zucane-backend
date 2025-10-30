@@ -31,7 +31,7 @@ class PaymentService:
             # 1. Verificar que la empresa tenga suficiente balance
             balance = self.stellar_service.get_account_balance(
                 empresa_public_key, 
-                "XOCHI"
+                settings.ASSET_NAME
             )
             
             if balance < amount:
@@ -49,7 +49,7 @@ class PaymentService:
                     from_secret=empresa_secret_key,
                     to_public=settings.TREASURY_PUBLIC_KEY,
                     amount=amount,
-                    asset_code="XOCHI",
+                    asset_code=settings.ASSET_NAME,
                     issuer_public=settings.GOVERNMENT_PUBLIC_KEY
                 )
             else:
@@ -115,10 +115,10 @@ class PaymentService:
     def get_empresa_balance(self, empresa_public_key: str) -> Dict[str, Any]:
         """Obtener balance de una empresa"""
         try:
-            # Balance de XOCHI tokens
+            # Balance del asset configurado
             xochi_balance = self.stellar_service.get_account_balance(
                 empresa_public_key, 
-                "XOCHI"
+                settings.ASSET_NAME
             )
             
             # Balance de XLM nativo

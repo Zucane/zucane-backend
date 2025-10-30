@@ -27,7 +27,7 @@ async def emitir_token(
     1. Poner cantidad_co2 (decimal)
     2. Poner issuer_pubkey (clave Stellar valida)
     3. Poner dist_pubkey (clave Stellar valida)
-    4. Opcional: asset_code (default XOCHI)
+    4. Opcional: asset_code (default ZUCOIN)
     
     RESPUESTA:
     - token_id: ID del token

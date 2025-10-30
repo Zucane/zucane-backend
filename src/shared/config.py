@@ -46,7 +46,7 @@ class Settings(BaseSettings):
     GOVERNMENT_SECRET_KEY: str = ""
     TREASURY_PUBLIC_KEY: str = ""
     TREASURY_SECRET_KEY: str = ""
-    ASSET_NAME: str = "XOCHI"
+    ASSET_NAME: str = "ZUCOIN"
     HORIZON_URL: str = "https://horizon-testnet.stellar.org"
 
     # Alias para compatibilidad con nombres solicitados
