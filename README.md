@@ -11,7 +11,7 @@ Sistema completo de gestión de tokens de CO2 con integración real a la red Ste
 - **Documentación Completa** - Swagger con documentación detallada
 - **Sistema de Auditoría** - Trazabilidad completa de transacciones
 - **Autenticación Simple** - Sistema de login básico
-- **Validación Stellar** - Claves públicas validadas en tiempo real
+- **Generación Automática de Claves Stellar** - Claves determinísticas basadas en datos de la empresa
 
 ## 📁 Estructura del Proyecto
 
@@ -65,7 +65,8 @@ Zucane-BackEnd/
 │   │   ├── auditoria_service.py     # Lógica de negocio
 │   │   └── auditoria_controller.py  # Endpoints REST
 │   ├── stellar/                   # Integración Stellar
-│   │   └── stellar_service.py     # Servicio Stellar real
+│   │   ├── stellar_service.py     # Servicio Stellar real
+│   │   └── key_generator.py       # Generador de claves determinísticas
 │   ├── payments/                  # Pagos Stellar
 │   │   ├── dto/
 │   │   │   └── payment_dto.py     # DTOs de pagos Stellar
@@ -205,9 +206,14 @@ SELECT * FROM tokens_co2;
 - Rol: `GOV_ADMIN`
 
 **Empresa de Prueba:**
-- RFC: `ABC123456789`
+- RFC: `ABC21024897` (persona moral - 12 caracteres)
 - Nombre: `Empresa de Prueba S.A. de C.V.`
-- Stellar Public Key: `GCTWI7YUCLHG2KAYZPN2VZGLKXITW474P2CMP2UJTTH56PGDL72YLLNZ`
+- Email: `contacto@empresaprueba.com`
+- **Claves Stellar**: Se generan automáticamente al crear la empresa
+
+**Tipos de RFC soportados:**
+- **Persona Física**: 13 caracteres (ej: `ABCD123456EF1`)
+- **Persona Moral**: 12 caracteres (ej: `COS621024897`)
 
 **Tokens de Prueba:**
 - 3 tokens de 1.0 tonelada CO2 cada uno
@@ -250,8 +256,8 @@ INSERT INTO users (email, password_hash, nombre, apellido, telefono, created_at)
 
 **Crear empresa de prueba:**
 ```sql
-INSERT INTO empresas (rfc, nombre, email, telefono, direccion, stellar_public_key, status, created_at) VALUES 
-('ABC123456789', 'Empresa de Prueba S.A. de C.V.', 'contacto@empresaprueba.com', '555-0002', 'Calle de Prueba 123, Ciudad de México', 'GCTWI7YUCLHG2KAYZPN2VZGLKXITW474P2CMP2UJTTH56PGDL72YLLNZ', 'activo', NOW());
+-- Nota: Las claves Stellar se generan automáticamente al crear la empresa
+-- Usar el endpoint POST /api/v1/empresas/ en lugar de SQL directo
 ```
 
 **Emitir tokens de prueba:**
@@ -420,11 +426,25 @@ python app.py
 ## 🌟 Integración Stellar
 
 ### Características
+- **Generación Automática de Claves**: Claves Stellar determinísticas basadas en datos de la empresa
 - **Validación Real**: Claves Stellar validadas con `stellar_sdk.StrKey`
 - **Transacciones Reales**: Pagos procesados en la red Stellar
 - **Verificación Automática**: Confirmación de transacciones
 - **Consultas de Balance**: Balance real de cuentas Stellar
 - **Manejo de Errores**: Gestión robusta de errores de red
+
+### Generación Determinística de Claves
+El sistema genera automáticamente claves Stellar únicas para cada empresa basándose en:
+- **RFC de la empresa** (12-13 caracteres, persona física o moral)
+- **Email de contacto**
+- **Nombre de la empresa**
+
+**Ventajas:**
+- ✅ **No requiere claves manuales** - Se generan automáticamente
+- ✅ **Determinísticas** - Mismos datos = mismas claves
+- ✅ **Únicas** - Diferentes datos = claves diferentes
+- ✅ **Seguras** - Basadas en HMAC-SHA256
+- ✅ **Consistentes** - Siempre reproducibles
 
 ### Flujo de Transacción
 1. **Crear Transacción** → Status: "pendiente"

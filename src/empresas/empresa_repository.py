@@ -17,6 +17,13 @@ class EmpresaRepository:
         self.db.refresh(empresa)
         return empresa
     
+    def create_from_dict(self, empresa_dict: dict) -> Empresa:
+        empresa = Empresa(**empresa_dict)
+        self.db.add(empresa)
+        self.db.commit()
+        self.db.refresh(empresa)
+        return empresa
+    
     def get_by_id(self, empresa_id: int) -> Optional[Empresa]:
         return self.db.query(Empresa).filter(Empresa.empresa_id == empresa_id).first()
     

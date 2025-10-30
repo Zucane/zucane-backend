@@ -1,7 +1,6 @@
 from pydantic import BaseModel, validator
 from typing import Optional
 from datetime import datetime
-from stellar_sdk import StrKey
 
 
 class EmpresaCreateDTO(BaseModel):
@@ -10,38 +9,20 @@ class EmpresaCreateDTO(BaseModel):
     email: str
     telefono: Optional[str] = None
     direccion: Optional[str] = None
-    stellar_public_key: str
+    # stellar_public_key se genera automáticamente
     
     @validator('rfc')
     def validate_rfc(cls, v):
-        if len(v) != 13:
-            raise ValueError('RFC debe tener 13 caracteres')
-        return v.upper()
+        # Validación básica: solo verificar que no esté vacío
+        if not v or len(v.strip()) == 0:
+            raise ValueError('RFC es requerido')
+        return v.upper().strip()
     
     @validator('email')
     def validate_email(cls, v):
         if '@' not in v:
             raise ValueError('Email debe ser válido')
         return v.lower()
-    
-    @validator('stellar_public_key')
-    def validate_stellar_key(cls, v):
-        if not v:
-            raise ValueError('Stellar public key es requerido')
-        
-        # Validar formato básico
-        if len(v) != 56:
-            raise ValueError('Stellar public key debe tener 56 caracteres')
-        if not v.startswith('G'):
-            raise ValueError('Stellar public key debe empezar con G')
-        
-        # Validar que sea una clave Stellar real usando Stellar SDK
-        try:
-            StrKey.decode_ed25519_public_key(v)
-        except Exception:
-            raise ValueError('Clave Stellar inválida. Debe ser una clave pública válida de Stellar')
-        
-        return v
 
 
 class EmpresaUpdateDTO(BaseModel):
@@ -63,6 +44,7 @@ class EmpresaResponseDTO(BaseModel):
     registro_fecha: datetime
     status: str
     stellar_public_key: str
+    stellar_secret_key: Optional[str] = None  # Solo para mostrar en creación
     
     class Config:
         from_attributes = True

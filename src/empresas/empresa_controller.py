@@ -16,26 +16,28 @@ async def crear_empresa(
     """
     CREAR EMPRESA
     
-    Registra una nueva empresa en el sistema.
+    Registra una nueva empresa en el sistema con generación automática de claves Stellar.
     
     QUE HACE:
-    - Valida RFC (13 caracteres)
+    - Valida RFC (persona física o moral)
     - Valida email
-    - Valida clave Stellar publica
+    - Genera claves Stellar automáticamente
     - Crea empresa con status "activo"
+    - Asigna claves determinísticas basadas en datos de la empresa
     
     COMO USAR:
-    1. Poner RFC de 13 caracteres
+    1. Poner RFC (12-13 caracteres)
     2. Poner nombre y email
-    3. Poner clave Stellar publica valida
-    4. Opcional: telefono y direccion
+    3. Opcional: telefono y direccion
+    4. Las claves Stellar se generan automáticamente
     
     RESPUESTA:
     - empresa_id: ID de la empresa
     - rfc: RFC validado
     - nombre: Nombre de la empresa
     - status: "activo"
-    - stellar_public_key: Clave Stellar
+    - stellar_public_key: Clave Stellar generada
+    - stellar_secret_key: Clave secreta generada (solo en creación)
     """
     try:
         service = EmpresaService(db)

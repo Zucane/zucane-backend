@@ -3,6 +3,7 @@ from typing import List, Optional
 from .entity.empresa_entity import Empresa
 from .dto.empresa_dto import EmpresaCreateDTO, EmpresaUpdateDTO, EmpresaResponseDTO, EmpresaListDTO
 from .empresa_repository import EmpresaRepository
+from ..stellar.key_generator import StellarKeyGenerator
 
 
 class EmpresaService:
@@ -15,7 +16,19 @@ class EmpresaService:
         if self.repository.get_by_rfc(empresa_data.rfc):
             raise ValueError("Ya existe una empresa con este RFC")
         
-        empresa = self.repository.create(empresa_data)
+        # Generar claves Stellar determinísticas
+        stellar_public_key, stellar_secret_key = StellarKeyGenerator.generate_keypair_from_empresa_data(
+            rfc=empresa_data.rfc,
+            email=empresa_data.email,
+            nombre=empresa_data.nombre
+        )
+        
+        # Crear empresa con claves Stellar generadas
+        empresa_dict = empresa_data.dict()
+        empresa_dict['stellar_public_key'] = stellar_public_key
+        empresa_dict['stellar_secret_key'] = stellar_secret_key  # Guardar también la secret key
+        
+        empresa = self.repository.create_from_dict(empresa_dict)
         return EmpresaResponseDTO.model_validate(empresa)
     
     def obtener_empresa(self, empresa_id: int) -> Optional[EmpresaResponseDTO]:
