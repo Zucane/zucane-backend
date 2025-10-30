@@ -1,0 +1,35 @@
+# Stellar Network
+stellar-sdk==13.1.0
+requests==2.31.0
+
+# Environment
+python-dotenv==1.0.0
+
+# FastAPI & Web Framework
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+
+# Database & ORM
+sqlalchemy>=2.0
+alembic==1.12.1
+mysqlclient==2.2.0
+
+# Data Validation
+pydantic>=2.7.0
+pydantic-settings>=2.11.0
+email-validator>=2.3.0
+
+# Authentication & Security
+python-jose[cryptography]>=3.3.0
+passlib[bcrypt]>=1.7.4
+
+# Caching & Background Tasks
+redis==5.0.1
+celery==5.3.4
+
+# Logging
+structlog==23.2.0
+
+# Development
+pytest==7.4.3
+pytest-asyncio==0.21.1
