@@ -10,6 +10,7 @@ class Transaccion(Base):
     
     transaccion_id: Mapped[int] = mapped_column(Integer, primary_key=True)
     empresa_id: Mapped[int] = mapped_column(ForeignKey("empresas.empresa_id"), nullable=False, index=True)
+    token_id: Mapped[int] = mapped_column(ForeignKey("tokens_co2.token_id"), nullable=False, index=True)
     # order_id: Mapped[int] = mapped_column(ForeignKey("orders.order_id"), nullable=False, index=True)  # Comentado temporalmente
     monto: Mapped[float] = mapped_column(Numeric(12, 2), nullable=False)
     fecha_compra: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())

@@ -17,6 +17,7 @@ from src.tokens.token_controller import router as tokens_router
 from src.transacciones.transaccion_controller import router as transacciones_router
 from src.pagos.pago_controller import router as pagos_router
 from src.auditoria.auditoria_controller import router as auditoria_router
+from src.payments.payment_controller import router as payments_router
 
 # Crear aplicación FastAPI
 app = FastAPI(
@@ -90,6 +91,7 @@ app.include_router(tokens_router, prefix=settings.API_V1_STR)
 app.include_router(transacciones_router, prefix=settings.API_V1_STR)
 app.include_router(pagos_router, prefix=settings.API_V1_STR)
 app.include_router(auditoria_router, prefix=settings.API_V1_STR)
+app.include_router(payments_router, prefix=settings.API_V1_STR)
 
 
 @app.on_event("startup")

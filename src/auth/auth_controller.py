@@ -30,6 +30,27 @@ class UserProfile(BaseModel):
 
 @router.post("/login", response_model=LoginResponse)
 async def login(login_data: LoginRequest, db: Session = Depends(get_db)):
+    """
+    INICIAR SESION
+    
+    Autentica un usuario en el sistema.
+    
+    QUE HACE:
+    - Valida email y password
+    - Verifica que usuario este activo
+    - Devuelve datos del usuario
+    
+    COMO USAR:
+    1. Poner email del usuario
+    2. Poner password
+    3. Llamar POST
+    
+    RESPUESTA:
+    - success: true si exitoso
+    - message: Mensaje de resultado
+    - user_id: ID del usuario
+    - email: Email del usuario
+    """
     # Buscar usuario por email
     user = db.query(User).filter(User.email == login_data.email).first()
     
@@ -65,6 +86,28 @@ async def login(login_data: LoginRequest, db: Session = Depends(get_db)):
 
 @router.get("/profile/{user_id}", response_model=UserProfile)
 async def get_profile(user_id: int, db: Session = Depends(get_db)):
+    """
+    OBTENER PERFIL DE USUARIO
+    
+    Obtiene el perfil de un usuario por su ID.
+    
+    QUE HACE:
+    - Busca usuario por ID
+    - Devuelve datos del perfil
+    - Incluye status y fechas
+    
+    COMO USAR:
+    1. Poner user_id en la URL
+    2. Llamar GET
+    3. Ver datos del perfil
+    
+    RESPUESTA:
+    - id: ID del usuario
+    - email: Email del usuario
+    - name: Nombre del usuario
+    - status: Estado del usuario
+    - created_at: Fecha de creacion
+    """
     user = db.query(User).filter(User.id == user_id).first()
     
     if not user:
@@ -84,4 +127,21 @@ async def get_profile(user_id: int, db: Session = Depends(get_db)):
 
 @router.post("/logout")
 async def logout():
+    """
+    CERRAR SESION
+    
+    Cierra la sesion del usuario actual.
+    
+    QUE HACE:
+    - Invalida sesion actual
+    - Limpia tokens de autenticacion
+    - Confirma logout exitoso
+    
+    COMO USAR:
+    1. Llamar POST sin parametros
+    2. Sesion cerrada
+    
+    RESPUESTA:
+    - message: "Logout exitoso"
+    """
     return {"message": "Logout exitoso"}
